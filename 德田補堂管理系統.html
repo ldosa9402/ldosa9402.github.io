@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>德田補堂管理系統</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-section h2 {
+            color: #2d3748;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #4a5568;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #edf2f7;
+        }
+
+        .btn-success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 2px solid #9ae6b4;
+        }
+
+        .btn-success:hover {
+            background: #9ae6b4;
+        }
+
+        .btn-warning {
+            background: #fed7d7;
+            color: #c53030;
+            border: 2px solid #feb2b2;
+        }
+
+        .btn-warning:hover {
+            background: #feb2b2;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .controls .btn {
+            flex: 1;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            color: #2d3748;
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-info {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .record-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .record-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .completed-item {
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+        }
+
+        .urgent-item {
+            background: #fff5f5;
+            border: 1px solid #feb2b2;
+        }
+
+        .record-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .record-date {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .days-ago {
+            font-size: 0.8rem;
+            color: #e53e3e;
+            font-weight: 500;
+        }
+
+        .record-reason {
+            color: #4a5568;
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .completed-date {
+            color: #22543d;
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #718096;
+        }
+
+        .empty-state h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .pagination-btn {
+            padding: 8px 16px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: #edf2f7;
+            border-color: #cbd5e0;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-info {
+            color: #4a5568;
+            font-size: 0.9rem;
+            margin: 0 10px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            background: #edf2f7;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        .pending-count {
+            color: #e53e3e;
+        }
+
+        .completed-count {
+            color: #38a169;
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>📚 德田補堂管理系統</h1>
+            <p>輕鬆管理您的補習班缺課記錄</p>
+        </div>
+
+        <!-- 新增記錄卡片 -->
+        <div class="card form-section">
+            <h2>新增缺課記錄</h2>
+            <form id="absenceForm">
+                <div class="form-group">
+                    <label for="date">缺課日期</label>
+                    <input type="date" id="date" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reason">缺課原因</label>
+                    <input type="text" id="reason" class="form-input" placeholder="例如：身體不適、家庭事務..." required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">➕ 新增記錄</button>
+            </form>
+        </div>
+
+        <!-- 統計資訊 -->
+        <div class="card">
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number pending-count" id="pendingCount">0</div>
+                    <div class="stat-label">待補課程</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number completed-count" id="completedCount">0</div>
+                    <div class="stat-label">已補回</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="totalCount">0</div>
+                    <div class="stat-label">總記錄數</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 資料管理 -->
+        <div class="card">
+            <div class="controls">
+                <button id="exportBtn" class="btn btn-secondary">📤 匯出資料</button>
+                <button id="importBtn" class="btn btn-secondary">📥 匯入資料</button>
+                <button id="clearAllBtn" class="btn btn-warning">🗑️ 清除所有資料</button>
+                <input type="file" id="importFile" accept=".json" style="display: none;">
+            </div>
+        </div>
+
+        <!-- 記錄列表 -->
+        <div class="content-grid">
+            <!-- 待補課程 -->
+            <div class="card">
+                <div class="section-header">
+                    <h2 class="section-title">⏰ 待補課程</h2>
+                    <span class="page-info">最久的優先顯示</span>
+                </div>
+                <div id="pendingList"></div>
+                <div id="pendingPagination" class="pagination" style="display: none;"></div>
+            </div>
+
+            <!-- 已補回 -->
+            <div class="card">
+                <div class="section-header">
+                    <h2 class="section-title">✅ 已補回</h2>
+                    <span class="page-info">最近的優先顯示</span>
+                </div>
+                <div id="completedList"></div>
+                <div id="completedPagination" class="pagination" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class AbsenceManager {
+            constructor() {
+                this.pendingAbsences = [];
+                this.completedAbsences = [];
+                this.nextId = 1;
+                this.pendingCurrentPage = 1;
+                this.completedCurrentPage = 1;
+                this.itemsPerPage = 5;
+                this.init();
+            }
+
+            init() {
+                this.bindEvents();
+                this.render();
+                this.updateStats();
+            }
+
+            bindEvents() {
+                document.getElementById('absenceForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.addAbsence();
+                });
+
+                document.getElementById('exportBtn').addEventListener('click', () => {
+                    this.exportData();
+                });
+
+                document.getElementById('importBtn').addEventListener('click', () => {
+                    document.getElementById('importFile').click();
+                });
+
+                document.getElementById('clearAllBtn').addEventListener('click', () => {
+                    this.clearAllData();
+                });
+
+                document.getElementById('importFile').addEventListener('change', (e) => {
+                    this.importData(e);
+                });
+            }
+
+            addAbsence() {
+                const date = document.getElementById('date').value;
+                const reason = document.getElementById('reason').value.trim();
+
+                if (date && reason) {
+                    this.pendingAbsences.push({
+                        id: this.nextId++,
+                        date: date,
+                        reason: reason,
+                        createdAt: new Date().toISOString()
+                    });
+
+                    // 重置到第一頁
+                    this.pendingCurrentPage = 1;
+                    this.render();
+                    this.updateStats();
+                    document.getElementById('absenceForm').reset();
+                }
+            }
+
+            markAsCompleted(id) {
+                const absenceIndex = this.pendingAbsences.findIndex(absence => absence.id === id);
+                if (absenceIndex !== -1) {
+                    const absence = this.pendingAbsences.splice(absenceIndex, 1)[0];
+                    absence.completedAt = new Date().toISOString();
+                    this.completedAbsences.push(absence);
+                    
+                    // 重新計算分頁
+                    this.adjustPendingPage();
+                    this.completedCurrentPage = 1;
+                    this.render();
+                    this.updateStats();
+                }
+            }
+
+            markAsPending(id) {
+                const absenceIndex = this.completedAbsences.findIndex(absence => absence.id === id);
+                if (absenceIndex !== -1) {
+                    const absence = this.completedAbsences.splice(absenceIndex, 1)[0];
+                    delete absence.completedAt;
+                    this.pendingAbsences.push(absence);
+                    
+                    // 重新計算分頁
+                    this.adjustCompletedPage();
+                    this.pendingCurrentPage = 1;
+                    this.render();
+                    this.updateStats();
+                }
+            }
+
+            deleteAbsence(id, isCompleted = false) {
+                if (confirm('確定要刪除這筆記錄嗎？')) {
+                    if (isCompleted) {
+                        this.completedAbsences = this.completedAbsences.filter(absence => absence.id !== id);
+                        this.adjustCompletedPage();
+                    } else {
+                        this.pendingAbsences = this.pendingAbsences.filter(absence => absence.id !== id);
+                        this.adjustPendingPage();
+                    }
+                    
+                    this.render();
+                    this.updateStats();
+                }
+            }
+
+            adjustPendingPage() {
+                const maxPage = Math.ceil(this.pendingAbsences.length / this.itemsPerPage);
+                if (this.pendingCurrentPage > maxPage && maxPage > 0) {
+                    this.pendingCurrentPage = maxPage;
+                }
+            }
+
+            adjustCompletedPage() {
+                const maxPage = Math.ceil(this.completedAbsences.length / this.itemsPerPage);
+                if (this.completedCurrentPage > maxPage && maxPage > 0) {
+                    this.completedCurrentPage = maxPage;
+                }
+            }
+
+            changePendingPage(direction) {
+                const maxPage = Math.ceil(this.pendingAbsences.length / this.itemsPerPage);
+                if (direction === 'prev' && this.pendingCurrentPage > 1) {
+                    this.pendingCurrentPage--;
+                } else if (direction === 'next' && this.pendingCurrentPage < maxPage) {
+                    this.pendingCurrentPage++;
+                }
+                this.renderPendingList();
+            }
+
+            changeCompletedPage(direction) {
+                const maxPage = Math.ceil(this.completedAbsences.length / this.itemsPerPage);
+                if (direction === 'prev' && this.completedCurrentPage > 1) {
+                    this.completedCurrentPage--;
+                } else if (direction === 'next' && this.completedCurrentPage < maxPage) {
+                    this.completedCurrentPage++;
+                }
+                this.renderCompletedList();
+            }
+
+            getDaysAgo(dateString) {
+                const date = new Date(dateString);
+                const today = new Date();
+                const diffTime = today - date;
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                return diffDays;
+            }
+
+            render() {
+                this.renderPendingList();
+                this.renderCompletedList();
+            }
+
+            renderPendingList() {
+                const pendingList = document.getElementById('pendingList');
+                const pendingPagination = document.getElementById('pendingPagination');
+                
+                if (this.pendingAbsences.length === 0) {
+                    pendingList.innerHTML = `
+                        <div class="empty-state">
+                            <h3>🎯 目前沒有待補課程</h3>
+                            <p>太棒了！沒有缺課需要補回</p>
+                        </div>
+                    `;
+                    pendingPagination.style.display = 'none';
+                    return;
+                }
+
+                // 按日期排序：最舊的在前
+                const sortedPending = [...this.pendingAbsences].sort((a, b) => 
+                    new Date(a.date) - new Date(b.date)
+                );
+
+                // 分頁邏輯
+                const startIndex = (this.pendingCurrentPage - 1) * this.itemsPerPage;
+                const endIndex = startIndex + this.itemsPerPage;
+                const pageItems = sortedPending.slice(startIndex, endIndex);
+                const totalPages = Math.ceil(sortedPending.length / this.itemsPerPage);
+
+                pendingList.innerHTML = pageItems.map(absence => {
+                    const daysAgo = this.getDaysAgo(absence.date);
+                    const isUrgent = daysAgo > 7; // 超過7天視為急迫
+                    return `
+                        <div class="record-item ${isUrgent ? 'urgent-item' : ''}">
+                            <div class="record-header">
+                                <span class="record-date">${this.formatDate(absence.date)}</span>
+                                <span class="days-ago">${daysAgo}天前</span>
+                            </div>
+                            <div class="record-reason">${absence.reason}</div>
+                            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                <button class="btn btn-success" onclick="absenceManager.markAsCompleted(${absence.id})" style="flex: 1;">
+                                    ✅ 標記為已補回
+                                </button>
+                                <button class="btn btn-warning" onclick="absenceManager.deleteAbsence(${absence.id}, false)" style="padding: 12px;">
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                // 顯示分頁控制器
+                if (totalPages > 1) {
+                    pendingPagination.style.display = 'flex';
+                    pendingPagination.innerHTML = `
+                        <button class="pagination-btn" onclick="absenceManager.changePendingPage('prev')" 
+                                ${this.pendingCurrentPage === 1 ? 'disabled' : ''}>
+                            ← 上一頁
+                        </button>
+                        <span class="pagination-info">第 ${this.pendingCurrentPage} 頁，共 ${totalPages} 頁</span>
+                        <button class="pagination-btn" onclick="absenceManager.changePendingPage('next')" 
+                                ${this.pendingCurrentPage === totalPages ? 'disabled' : ''}>
+                            下一頁 →
+                        </button>
+                    `;
+                } else {
+                    pendingPagination.style.display = 'none';
+                }
+            }
+
+            renderCompletedList() {
+                const completedList = document.getElementById('completedList');
+                const completedPagination = document.getElementById('completedPagination');
+                
+                if (this.completedAbsences.length === 0) {
+                    completedList.innerHTML = `
+                        <div class="empty-state">
+                            <h3>📝 還沒有已補回的記錄</h3>
+                            <p>完成補課後，記錄會出現在這裡</p>
+                        </div>
+                    `;
+                    completedPagination.style.display = 'none';
+                    return;
+                }
+
+                // 按補回時間排序：最新的在前
+                const sortedCompleted = [...this.completedAbsences].sort((a, b) => 
+                    new Date(b.completedAt) - new Date(a.completedAt)
+                );
+
+                // 分頁邏輯
+                const startIndex = (this.completedCurrentPage - 1) * this.itemsPerPage;
+                const endIndex = startIndex + this.itemsPerPage;
+                const pageItems = sortedCompleted.slice(startIndex, endIndex);
+                const totalPages = Math.ceil(sortedCompleted.length / this.itemsPerPage);
+
+                completedList.innerHTML = pageItems.map(absence => `
+                    <div class="record-item completed-item">
+                        <div class="record-header">
+                            <span class="record-date">${this.formatDate(absence.date)}</span>
+                        </div>
+                        <div class="record-reason">${absence.reason}</div>
+                        <div class="completed-date">補回時間：${this.formatDateTime(absence.completedAt)}</div>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <button class="btn btn-secondary" onclick="absenceManager.markAsPending(${absence.id})" style="flex: 1;">
+                                ↩️ 移回待補列表
+                            </button>
+                            <button class="btn btn-warning" onclick="absenceManager.deleteAbsence(${absence.id}, true)" style="padding: 12px;">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+
+                // 顯示分頁控制器
+                if (totalPages > 1) {
+                    completedPagination.style.display = 'flex';
+                    completedPagination.innerHTML = `
+                        <button class="pagination-btn" onclick="absenceManager.changeCompletedPage('prev')" 
+                                ${this.completedCurrentPage === 1 ? 'disabled' : ''}>
+                            ← 上一頁
+                        </button>
+                        <span class="pagination-info">第 ${this.completedCurrentPage} 頁，共 ${totalPages} 頁</span>
+                        <button class="pagination-btn" onclick="absenceManager.changeCompletedPage('next')" 
+                                ${this.completedCurrentPage === totalPages ? 'disabled' : ''}>
+                            下一頁 →
+                        </button>
+                    `;
+                } else {
+                    completedPagination.style.display = 'none';
+                }
+            }
+
+            updateStats() {
+                document.getElementById('pendingCount').textContent = this.pendingAbsences.length;
+                document.getElementById('completedCount').textContent = this.completedAbsences.length;
+                document.getElementById('totalCount').textContent = this.pendingAbsences.length + this.completedAbsences.length;
+            }
+
+            formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('zh-TW', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    weekday: 'short'
+                });
+            }
+
+            formatDateTime(dateTimeString) {
+                const date = new Date(dateTimeString);
+                return date.toLocaleString('zh-TW', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+
+            exportData() {
+                const exportData = {
+                    pendingAbsences: this.pendingAbsences,
+                    completedAbsences: this.completedAbsences,
+                    exportDate: new Date().toISOString()
+                };
+
+                const dataStr = JSON.stringify(exportData, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `缺課記錄_${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+
+            importData(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+                        
+                        if (importedData.pendingAbsences && importedData.completedAbsences) {
+                            if (confirm('匯入資料將覆蓋現有的所有記錄，是否繼續？')) {
+                                this.pendingAbsences = importedData.pendingAbsences || [];
+                                this.completedAbsences = importedData.completedAbsences || [];
+                                
+                                // 更新 nextId
+                                const allIds = [
+                                    ...this.pendingAbsences.map(a => a.id),
+                                    ...this.completedAbsences.map(a => a.id)
+                                ];
+                                this.nextId = allIds.length > 0 ? Math.max(...allIds) + 1 : 1;
+                                
+                                // 重置分頁
+                                this.pendingCurrentPage = 1;
+                                this.completedCurrentPage = 1;
+                                
+                                this.render();
+                                this.updateStats();
+                                alert('✅ 資料匯入成功！');
+                            }
+                        } else {
+                            alert('❌ 檔案格式不正確');
+                        }
+                    } catch (error) {
+                        alert('❌ 匯入失敗，請確保檔案格式正確');
+                    }
+                };
+                reader.readAsText(file);
+                event.target.value = '';
+            }
+
+            clearAllData() {
+                if (confirm('確定要清除所有資料嗎？此操作無法復原！')) {
+                    this.pendingAbsences = [];
+                    this.completedAbsences = [];
+                    this.nextId = 1;
+                    this.pendingCurrentPage = 1;
+                    this.completedCurrentPage = 1;
+                    this.render();
+                    this.updateStats();
+                    alert('✅ 所有資料已清除');
+                }
+            }
+        }
+
+        // 初始化應用程式
+        const absenceManager = new AbsenceManager();
+    </script>
+</body>
+</html>
