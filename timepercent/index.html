@@ -1,1 +1,87 @@
-timepercent/index.html
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TimePercent%</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "PingFang TC", "Microsoft JhengHei", Segoe UI, Roboto, Arial, sans-serif;
+      line-height: 1.5;
+      padding: 24px;
+    }
+    .container { max-width: 640px; margin: 0 auto; }
+    h1 { margin: 0 0 8px; font-size: 22px; }
+    #now { opacity: .8; margin-bottom: 8px; }
+    .percent {
+      font-variant-numeric: tabular-nums;
+      font-size: 40px;
+      font-weight: 800;
+      margin: 8px 0 16px;
+    }
+    .progress { height: 12px; background: #e5e7eb; border-radius: 999px; overflow: hidden; }
+    @media (prefers-color-scheme: dark) {
+      .progress { background: #2b2f36; }
+    }
+    .fill { height: 100%; width: 0%; background: linear-gradient(90deg, #4f46e5, #06b6d4); transition: width .2s linear; }
+    .legend { display: flex; justify-content: space-between; font-size: 12px; opacity: .8; margin-top: 6px; font-variant-numeric: tabular-nums; }
+    .note { font-size: 12px; opacity: .7; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>今天已經過了多少時間？</h1>
+    <div id="now">—</div>
+    <div class="percent" id="percent">0%</div>
+
+    <div class="progress" role="progressbar" aria-label="今日進度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress">
+      <div class="fill" id="fill"></div>
+    </div>
+    <div class="legend">
+      <span id="start">00:00</span>
+      <span id="end">24:00</span>
+    </div>
+    <div class="note">以你的本地時區計算（從今日凌晨到下一次凌晨；自動處理夏令時間）</div>
+  </div>
+
+  <script>
+  (() => {
+    const nowEl = document.getElementById('now');
+    const percentEl = document.getElementById('percent');
+    const fillEl = document.getElementById('fill');
+    const progressEl = document.getElementById('progress');
+    const startEl = document.getElementById('start');
+    const endEl = document.getElementById('end');
+
+    const dateFmt = new Intl.DateTimeFormat(undefined, { dateStyle: 'full', timeStyle: 'medium' });
+    const timeFmt = new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' });
+
+    function startOfDay(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+    function startOfNextDay(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1); }
+
+    function update() {
+      const now = new Date();
+      const start = startOfDay(now);
+      const next = startOfNextDay(now);
+
+      const elapsed = now - start;  // 已過毫秒
+      const total = next - start;   // 今日總毫秒（DST 可能不是整整 24 小時）
+      const pct = Math.min(100, Math.max(0, (elapsed / total) * 100));
+
+      nowEl.textContent = dateFmt.format(now);
+      percentEl.textContent = pct.toFixed(2) + '%';
+      fillEl.style.width = pct + '%';
+      progressEl.setAttribute('aria-valuenow', pct.toFixed(2));
+      startEl.textContent = timeFmt.format(start);
+      endEl.textContent = timeFmt.format(next);
+    }
+
+    update();
+    const timer = setInterval(update, 200);
+    window.addEventListener('beforeunload', () => clearInterval(timer));
+  })();
+  </script>
+</body>
+</html>
