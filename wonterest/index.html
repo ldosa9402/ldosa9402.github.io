@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wonterest</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f0f0f0;
+        }
+
+        /* 简化的头部 */
+        header {
+            background: white;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 24px;
+        }
+
+        .header-info {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .current-repo {
+            color: #0066cc;
+            font-weight: 600;
+        }
+
+        /* 悬浮设置按钮 */
+        .settings-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+            z-index: 999;
+        }
+
+        .settings-fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+        }
+
+        .settings-fab svg {
+            width: 28px;
+            height: 28px;
+            fill: white;
+            animation: rotate 8s linear infinite;
+        }
+
+        .settings-fab.active svg {
+            animation: rotate 0.5s linear;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* 设置面板 */
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100vh;
+            background: white;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.2);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .settings-panel.active {
+            right: 0;
+        }
+
+        .settings-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            z-index: 999;
+        }
+
+        .settings-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .settings-header {
+            padding: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .settings-header h2 {
+            font-size: 20px;
+        }
+
+        .close-settings {
+            cursor: pointer;
+            font-size: 28px;
+            line-height: 1;
+            opacity: 0.9;
+            transition: opacity 0.3s;
+        }
+
+        .close-settings:hover {
+            opacity: 1;
+        }
+
+        .settings-content {
+            padding: 25px;
+        }
+
+        .source-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .source-tab {
+            flex: 1;
+            padding: 10px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .source-tab:hover {
+            color: #667eea;
+        }
+
+        .source-tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .source-section {
+            display: none;
+        }
+
+        .source-section.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group .hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            line-height: 1.5;
+        }
+
+        .form-group .hint a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .form-group .hint a:hover {
+            text-decoration: underline;
+        }
+
+        .token-input {
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .rate-limit-info {
+            background: #e3f2fd;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #1976d2;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .rate-limit-info.show {
+            display: block;
+        }
+
+        .rate-limit-info.warning {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .success-message {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 瀑布流容器 */
+        .masonry {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 15px 80px 15px;
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .masonry-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* 图片卡片 */
+        .card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            position: relative;
+            width: 100%;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        .card img, .card video {
+            width: 100%;
+            display: block;
+            transition: opacity 0.3s;
+        }
+
+        .card img:hover, .card video:hover {
+            opacity: 0.95;
+        }
+
+        .card video {
+            background: #000;
+        }
+
+        .card-info {
+            padding: 12px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 5px;
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .card-repo {
+            font-size: 12px;
+            color: #666;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .video-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .play-icon {
+            width: 0;
+            height: 0;
+            border-left: 8px solid white;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+
+        /* 加载动画 */
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+            font-size: 16px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 灯箱效果 */
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .lightbox.active {
+            display: flex;
+        }
+
+        .lightbox-content {
+            max-width: 90%;
+            max-height: 90%;
+            position: relative;
+        }
+
+        .lightbox img, .lightbox video {
+            max-width: 100%;
+            max-height: 90vh;
+            border-radius: 8px;
+        }
+
+        .lightbox video {
+            background: #000;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.2);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .lightbox-close:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .lightbox-info {
+            color: white;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .error {
+            color: #d32f2f;
+            padding: 15px;
+            background: #ffebee;
+            margin: 20px;
+            border-radius: 8px;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .error-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #666;
+        }
+
+        .empty-state svg {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* 响应式 */
+        @media (max-width: 600px) {
+            .settings-panel {
+                width: 100%;
+                right: -100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>📌 Wonterest</h1>
+            <div class="header-info">
+                <span class="current-repo" id="currentRepo"></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 悬浮设置按钮 -->
+    <div class="settings-fab" id="settingsFab">
+        <svg viewBox="0 0 24 24">
+            <path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z" />
+        </svg>
+    </div>
+
+    <!-- 设置面板遮罩 -->
+    <div class="settings-overlay" id="settingsOverlay"></div>
+
+    <!-- 设置面板 -->
+    <div class="settings-panel" id="settingsPanel">
+        <div class="settings-header">
+            <h2>⚙️ 设置</h2>
+            <span class="close-settings" id="closeSettings">&times;</span>
+        </div>
+        <div class="settings-content">
+            <!-- 数据源选项卡 -->
+            <div class="source-tabs">
+                <button class="source-tab active" data-source="github">GitHub</button>
+                <button class="source-tab" data-source="json">JSON URL</button>
+            </div>
+
+            <!-- GitHub 数据源 -->
+            <div class="source-section active" id="githubSection">
+                <div class="form-group">
+                    <label>GitHub 仓库</label>
+                    <input type="text" id="repoInput" placeholder="例: owner/repo">
+                    <div class="hint">格式: owner/repo</div>
+                </div>
+
+                <div class="form-group">
+                    <label>文件夹路径 (可选)</label>
+                    <input type="text" id="pathInput" placeholder="例: folder">
+                    <div class="hint">留空则搜索整个仓库</div>
+                </div>
+
+                <div class="form-group">
+                    <label>GitHub Token (可选)</label>
+                    <input type="password" id="tokenInput" class="token-input" placeholder="ghp_xxxxxxxxxxxx">
+                    <div class="hint">
+                        用于提高API限制 (60→5000次/小时)<br>
+                        <a href="https://github.com/settings/tokens/new" target="_blank">点此创建Token</a> (只需勾选 public_repo)
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-secondary" id="saveTokenBtn">保存Token</button>
+                    <button class="btn-primary" id="loadBtn">加载媒体</button>
+                </div>
+            </div>
+
+            <!-- JSON URL 数据源 -->
+            <div class="source-section" id="jsonSection">
+                <div class="form-group">
+                    <label>JSON URL</label>
+                    <input type="url" id="jsonUrlInput" placeholder="https://example.com/media.json">
+                    <div class="hint">JSON 格式: {"media": [{"id": "timestamp", "url": "..."}]}</div>
+                </div>
+
+                <div class="form-group">
+                    <label>示例 JSON (可选)</label>
+                    <textarea id="jsonPreview" readonly>
+{
+  "media": [
+    {
+      "id": "20251101213946",
+      "url": "https://example.com/image.jpg"
+    },
+    {
+      "id": "20251101213945",
+      "url": "https://example.com/video.mp4"
+    }
+  ]
+}</textarea>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-primary" id="loadJsonBtn">加载媒体</button>
+                </div>
+            </div>
+
+            <div class="success-message" id="successMsg"></div>
+            <div class="rate-limit-info" id="rateLimit"></div>
+        </div>
+    </div>
+
+    <div id="loading" class="loading" style="display:none;">
+        <div class="spinner"></div>
+        <p>正在加载媒体文件...</p>
+    </div>
+
+    <div id="error" class="error" style="display:none;"></div>
+
+    <div id="emptyState" class="empty-state">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M21,17H7V3H21M21,1H7A2,2 0 0,0 5,3V17A2,2 0 0,0 7,19H21A2,2 0 0,0 23,17V3A2,2 0 0,0 21,1M3,5H1V21A2,2 0 0,0 3,23H19V21H3M15.96,10.29L13.21,13.83L11.25,11.47L8.5,15H19.5L15.96,10.29Z" />
+        </svg>
+        <h3>欢迎使用 Wonterest</h3>
+        <p>点击右下角的设置按钮<br>输入仓库信息并加载图片</p>
+    </div>
+
+    <div id="masonry" class="masonry"></div>
+
+    <div id="lightbox" class="lightbox">
+        <div class="lightbox-content">
+            <span class="lightbox-close">&times;</span>
+            <img id="lightboxImg" src="" alt="" style="display:none;">
+            <video id="lightboxVideo" controls style="display:none;"></video>
+            <div class="lightbox-info">
+                <div id="lightboxTitle"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const repoInput = document.getElementById('repoInput');
+        const pathInput = document.getElementById('pathInput');
+        const tokenInput = document.getElementById('tokenInput');
+        const jsonUrlInput = document.getElementById('jsonUrlInput');
+        const loadBtn = document.getElementById('loadBtn');
+        const loadJsonBtn = document.getElementById('loadJsonBtn');
+        const saveTokenBtn = document.getElementById('saveTokenBtn');
+        const masonry = document.getElementById('masonry');
+        const loading = document.getElementById('loading');
+        const errorDiv = document.getElementById('error');
+        const successMsg = document.getElementById('successMsg');
+        const rateLimit = document.getElementById('rateLimit');
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightboxImg');
+        const lightboxVideo = document.getElementById('lightboxVideo');
+        const lightboxTitle = document.getElementById('lightboxTitle');
+        const currentRepo = document.getElementById('currentRepo');
+        const emptyState = document.getElementById('emptyState');
+
+        // 设置面板相关
+        const settingsFab = document.getElementById('settingsFab');
+        const settingsPanel = document.getElementById('settingsPanel');
+        const settingsOverlay = document.getElementById('settingsOverlay');
+        const closeSettings = document.getElementById('closeSettings');
+
+        // 数据源切换
+        const sourceTabs = document.querySelectorAll('.source-tab');
+        const githubSection = document.getElementById('githubSection');
+        const jsonSection = document.getElementById('jsonSection');
+
+        // 支持的文件格式
+        const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.svg', '.webp', '.bmp'];
+        const videoExtensions = ['.mp4', '.webm', '.mov', '.avi', '.mkv', '.m4v'];
+
+        // 瀑布流列数
+        let columnCount = 5;
+
+        // 从localStorage加载token
+        let githubToken = localStorage.getItem('githubToken') || '';
+        if (githubToken) {
+            tokenInput.value = githubToken;
+        }
+
+        // 数据源切换
+        sourceTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                sourceTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                const source = tab.dataset.source;
+                if (source === 'github') {
+                    githubSection.classList.add('active');
+                    jsonSection.classList.remove('active');
+                } else {
+                    githubSection.classList.remove('active');
+                    jsonSection.classList.add('active');
+                }
+            });
+        });
+
+        // 响应式调整列数
+        function updateColumnCount() {
+            const width = window.innerWidth;
+            if (width <= 400) columnCount = 1;
+            else if (width <= 600) columnCount = 2;
+            else if (width <= 900) columnCount = 3;
+            else if (width <= 1200) columnCount = 4;
+            else columnCount = 5;
+        }
+
+        // 打开设置面板
+        function openSettings() {
+            settingsPanel.classList.add('active');
+            settingsOverlay.classList.add('active');
+            settingsFab.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // 关闭设置面板
+        function closeSettingsPanel() {
+            settingsPanel.classList.remove('active');
+            settingsOverlay.classList.remove('active');
+            settingsFab.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        settingsFab.addEventListener('click', openSettings);
+        closeSettings.addEventListener('click', closeSettingsPanel);
+        settingsOverlay.addEventListener('click', closeSettingsPanel);
+
+        // 保存Token
+        saveTokenBtn.addEventListener('click', () => {
+            const token = tokenInput.value.trim();
+            if (token) {
+                localStorage.setItem('githubToken', token);
+                githubToken = token;
+                showSuccess('Token已保存！');
+                checkRateLimit();
+            } else {
+                localStorage.removeItem('githubToken');
+                githubToken = '';
+                showSuccess('Token已清除');
+                rateLimit.classList.remove('show');
+            }
+        });
+
+        // 检查API限制
+        async function checkRateLimit() {
+            try {
+                const headers = {};
+                if (githubToken) {
+                    headers['Authorization'] = `token ${githubToken}`;
+                }
+
+                const response = await fetch('https://api.github.com/rate_limit', { headers });
+                const data = await response.json();
+                
+                const remaining = data.rate.remaining;
+                const limit = data.rate.limit;
+                
+                rateLimit.textContent = `API剩余额度: ${remaining} / ${limit}`;
+                rateLimit.classList.add('show');
+                
+                if (remaining < 10) {
+                    rateLimit.classList.add('warning');
+                } else {
+                    rateLimit.classList.remove('warning');
+                }
+            } catch (e) {
+                console.error('无法检查API限制:', e);
+            }
+        }
+
+        // 从 JSON URL 加载媒体
+        async function loadFromJson() {
+            const jsonUrl = jsonUrlInput.value.trim();
+
+            if (!jsonUrl) {
+                showSuccess('请输入 JSON URL');
+                return;
+            }
+
+            closeSettingsPanel();
+            masonry.innerHTML = '';
+            emptyState.style.display = 'none';
+            errorDiv.style.display = 'none';
+            loading.style.display = 'block';
+            loadJsonBtn.disabled = true;
+
+            try {
+                const response = await fetch(jsonUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                if (!data.media || !Array.isArray(data.media)) {
+                    throw new Error('JSON 格式错误：缺少 media 数组');
+                }
+
+                if (data.media.length === 0) {
+                    showError('未找到媒体文件', 'JSON 中的 media 数组为空');
+                    emptyState.style.display = 'block';
+                    return;
+                }
+
+                // 转换为统一格式
+                const files = data.media.map(item => {
+                    const url = item.url;
+                    const ext = url.toLowerCase().substring(url.lastIndexOf('.'));
+                    const isVideo = videoExtensions.includes(ext);
+                    
+                    return {
+                        name: item.id || 'unknown',
+                        url: item.url,
+                        path: item.id || 'unknown',
+                        type: isVideo ? 'video' : 'image'
+                    };
+                });
+
+                // 按 ID (时间戳) 排序（降序，最新的在前）
+                files.sort((a, b) => {
+                    return b.name.localeCompare(a.name, undefined, { numeric: true });
+                });
+
+                displayMedia(files);
+                currentRepo.textContent = `JSON (${files.length} 个文件)`;
+            } catch (error) {
+                console.error('Error details:', error);
+                let errorMsg = error.message;
+                let helpText = '';
+
+                if (error.message.includes('Failed to fetch')) {
+                    errorMsg = '无法获取 JSON 数据';
+                    helpText = '请检查 URL 是否正确，以及是否支持 CORS 跨域访问。';
+                }
+
+                showError(errorMsg, helpText);
+                emptyState.style.display = 'block';
+            } finally {
+                loading.style.display = 'none';
+                loadJsonBtn.disabled = false;
+            }
+        }
+
+        // 从 GitHub 加载媒体文件
+        async function loadFromGithub() {
+            const repo = repoInput.value.trim();
+            const path = pathInput.value.trim();
+
+            if (!repo) {
+                showSuccess('请输入GitHub仓库名称');
+                return;
+            }
+
+            closeSettingsPanel();
+            masonry.innerHTML = '';
+            emptyState.style.display = 'none';
+            errorDiv.style.display = 'none';
+            loading.style.display = 'block';
+            loadBtn.disabled = true;
+
+            try {
+                const files = await fetchGitHubFiles(repo, path);
+                
+                if (files.length === 0) {
+                    showError('未找到媒体文件', `在 ${repo}/${path || '根目录'} 中没有找到图片或视频`);
+                    emptyState.style.display = 'block';
+                    return;
+                }
+
+                // 按文件名排序（降序，最新的在前）
+                files.sort((a, b) => {
+                    return b.name.localeCompare(a.name, undefined, { numeric: true });
+                });
+
+                displayMedia(files);
+                currentRepo.textContent = `${repo}${path ? ' / ' + path : ''} (${files.length} 个文件)`;
+                checkRateLimit();
+            } catch (error) {
+                console.error('Error details:', error);
+                let errorMsg = error.message;
+                let helpText = '';
+
+                if (error.message.includes('403')) {
+                    errorMsg = 'API访问受限 (403错误)';
+                    helpText = '请在设置中输入GitHub Token以提高API限制。';
+                } else if (error.message.includes('404')) {
+                    errorMsg = '仓库或路径不存在 (404错误)';
+                    helpText = `请检查仓库名称 "${repo}" 和路径 "${path}" 是否正确。`;
+                }
+
+                showError(errorMsg, helpText);
+                emptyState.style.display = 'block';
+            } finally {
+                loading.style.display = 'none';
+                loadBtn.disabled = false;
+            }
+        }
+
+        // 从GitHub获取文件
+        async function fetchGitHubFiles(repo, path = '') {
+            const apiUrl = `https://api.github.com/repos/${repo}/contents/${path}`;
+            
+            const headers = {
+                'Accept': 'application/vnd.github.v3+json'
+            };
+
+            if (githubToken) {
+                headers['Authorization'] = `token ${githubToken}`;
+            }
+
+            const response = await fetch(apiUrl, { headers });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            const files = [];
+
+            for (const item of data) {
+                if (item.type === 'file') {
+                    const ext = item.name.toLowerCase().substring(item.name.lastIndexOf('.'));
+                    if (imageExtensions.includes(ext) || videoExtensions.includes(ext)) {
+                        const isVideo = videoExtensions.includes(ext);
+                        files.push({
+                            name: item.name,
+                            url: item.download_url,
+                            path: item.path,
+                            type: isVideo ? 'video' : 'image'
+                        });
+                    }
+                } else if (item.type === 'dir') {
+                    try {
+                        const subFiles = await fetchGitHubFiles(repo, item.path);
+                        files.push(...subFiles);
+                    } catch (e) {
+                        console.warn(`无法访问文件夹: ${item.path}`, e);
+                    }
+                }
+            }
+
+            return files;
+        }
+
+        // 显示媒体文件 - 使用瀑布流布局
+        function displayMedia(files) {
+            masonry.innerHTML = '';
+            updateColumnCount();
+
+            // 创建列
+            const columns = [];
+            const columnHeights = [];
+            
+            for (let i = 0; i < columnCount; i++) {
+                const column = document.createElement('div');
+                column.className = 'masonry-column';
+                masonry.appendChild(column);
+                columns.push(column);
+                columnHeights.push(0);
+            }
+
+            // 按从左到右、从上到下的顺序添加卡片
+            files.forEach((file, index) => {
+                // 选择当前最短的列
+                const minHeight = Math.min(...columnHeights);
+                const columnIndex = columnHeights.indexOf(minHeight);
+                
+                const card = createCard(file);
+                columns[columnIndex].appendChild(card);
+                
+                // 估算卡片高度
+                columnHeights[columnIndex] += 300;
+            });
+        }
+
+        // 创建卡片元素
+        function createCard(file) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            
+            if (file.type === 'video') {
+                const video = document.createElement('video');
+                video.src = file.url;
+                video.muted = true;
+                video.loop = true;
+                video.playsInline = true;
+                
+                // 鼠标悬停时播放预览
+                card.addEventListener('mouseenter', () => {
+                    video.play();
+                });
+                card.addEventListener('mouseleave', () => {
+                    video.pause();
+                    video.currentTime = 0;
+                });
+                
+                const badge = document.createElement('div');
+                badge.className = 'video-badge';
+                badge.innerHTML = '<div class="play-icon"></div> 视频';
+                
+                card.appendChild(video);
+                card.appendChild(badge);
+            } else {
+                const img = document.createElement('img');
+                img.src = file.url;
+                img.alt = file.name;
+                img.loading = 'lazy';
+                card.appendChild(img);
+            }
+            
+            const cardInfo = document.createElement('div');
+            cardInfo.className = 'card-info';
+            
+            const title = document.createElement('div');
+            title.className = 'card-title';
+            title.textContent = file.name;
+            
+            const repoInfo = document.createElement('div');
+            repoInfo.className = 'card-repo';
+            repoInfo.textContent = file.path;
+            
+            cardInfo.appendChild(title);
+            cardInfo.appendChild(repoInfo);
+            
+            card.appendChild(cardInfo);
+            
+            card.addEventListener('click', () => {
+                openLightbox(file.url, file.name, file.type);
+            });
+            
+            return card;
+        }
+
+        // 打开灯箱
+        function openLightbox(url, title, type) {
+            if (type === 'video') {
+                lightboxVideo.src = url;
+                lightboxVideo.style.display = 'block';
+                lightboxImg.style.display = 'none';
+            } else {
+                lightboxImg.src = url;
+                lightboxImg.style.display = 'block';
+                lightboxVideo.style.display = 'none';
+                lightboxVideo.pause();
+            }
+            lightboxTitle.textContent = title;
+            lightbox.classList.add('active');
+        }
+
+        // 关闭灯箱
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            lightboxVideo.pause();
+            lightboxVideo.src = '';
+        }
+
+        // 显示错误
+        function showError(message, help = '') {
+            errorDiv.innerHTML = `
+                <div class="error-title">❌ ${message}</div>
+                ${help ? `<div>${help}</div>` : ''}
+            `;
+            errorDiv.style.display = 'block';
+        }
+
+        // 显示成功消息
+        function showSuccess(message) {
+            successMsg.textContent = '✓ ' + message;
+            successMsg.classList.add('show');
+            setTimeout(() => {
+                successMsg.classList.remove('show');
+            }, 3000);
+        }
+
+        // 事件监听
+        loadBtn.addEventListener('click', loadFromGithub);
+        loadJsonBtn.addEventListener('click', loadFromJson);
+
+        repoInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') loadFromGithub();
+        });
+
+        pathInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') loadFromGithub();
+        });
+
+        jsonUrlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') loadFromJson();
+        });
+
+        tokenInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                saveTokenBtn.click();
+            }
+        });
+
+        document.querySelector('.lightbox-close').addEventListener('click', closeLightbox);
+
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) closeLightbox();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (lightbox.classList.contains('active')) {
+                    closeLightbox();
+                } else if (settingsPanel.classList.contains('active')) {
+                    closeSettingsPanel();
+                }
+            }
+        });
+
+        // 窗口大小改变时重新布局
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                const currentFiles = Array.from(document.querySelectorAll('.card')).map(card => {
+                    return {
+                        name: card.querySelector('.card-title').textContent,
+                        url: card.querySelector('img, video').src,
+                        path: card.querySelector('.card-repo').textContent,
+                        type: card.querySelector('video') ? 'video' : 'image'
+                    };
+                });
+                if (currentFiles.length > 0) {
+                    displayMedia(currentFiles);
+                }
+            }, 250);
+        });
+
+        // 页面加载时检查API限制
+        if (githubToken) {
+            checkRateLimit();
+        }
+    </script>
+</body>
+</html>
