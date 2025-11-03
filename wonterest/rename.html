@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件时间戳重命名工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 700px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 24px;
+        }
+        
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: #f8f9ff;
+        }
+        
+        .upload-area.dragover {
+            background: #e8ebff;
+            border-color: #764ba2;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .file-list {
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .file-list.show {
+            display: block;
+        }
+        
+        .file-item {
+            background: #f8f9ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .file-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .file-number {
+            background: #667eea;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        
+        .file-item-info {
+            font-size: 14px;
+            color: #555;
+            margin: 5px 0;
+        }
+        
+        .file-name {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .new-name {
+            color: #764ba2;
+            font-weight: bold;
+        }
+        
+        .file-size {
+            color: #999;
+            font-size: 12px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        
+        .btn-download {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-download:hover {
+            background: #5568d3;
+            transform: translateY(-1px);
+        }
+        
+        .btn-remove {
+            background: #ff6b6b;
+            color: white;
+            margin-left: 8px;
+        }
+        
+        .btn-remove:hover {
+            background: #ee5a52;
+        }
+        
+        .action-buttons {
+            margin-top: 20px;
+            display: none;
+            gap: 10px;
+        }
+        
+        .action-buttons.show {
+            display: flex;
+        }
+        
+        .btn-primary {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            font-size: 16px;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            flex: 1;
+            background: #ff6b6b;
+            color: white;
+            padding: 15px;
+            font-size: 16px;
+        }
+        
+        .btn-secondary:hover {
+            background: #ee5a52;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 107, 107, 0.4);
+        }
+        
+        .icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .file-count {
+            text-align: center;
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📝 文件批量时间戳重命名</h1>
+        
+        <div class="upload-area" id="uploadArea">
+            <div class="icon">📁</div>
+            <p style="color: #666; margin-bottom: 10px;">点击选择文件或拖拽文件到这里</p>
+            <p style="color: #999; font-size: 14px;">支持多文件选择，按添加顺序时间命名</p>
+            <input type="file" id="fileInput" multiple>
+        </div>
+        
+        <div class="file-list" id="fileList">
+            <div class="file-count" id="fileCount"></div>
+            <div id="fileItems"></div>
+        </div>
+        
+        <div class="action-buttons" id="actionButtons">
+            <button class="btn btn-primary" id="downloadAllBtn">📥 下载全部文件</button>
+            <button class="btn btn-secondary" id="clearAllBtn">🗑️ 清空列表</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script>
+        let filesList = [];
+        let fileCounter = 0;
+        
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        const fileItems = document.getElementById('fileItems');
+        const fileCount = document.getElementById('fileCount');
+        const actionButtons = document.getElementById('actionButtons');
+        const downloadAllBtn = document.getElementById('downloadAllBtn');
+        const clearAllBtn = document.getElementById('clearAllBtn');
+        
+        // 生成时间戳文件名（精确到秒）
+        function generateTimestampName(originalName, timestamp) {
+            const date = new Date(timestamp);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hour = String(date.getHours()).padStart(2, '0');
+            const minute = String(date.getMinutes()).padStart(2, '0');
+            const second = String(date.getSeconds()).padStart(2, '0');
+            
+            const timestampStr = `${year}${month}${day}${hour}${minute}${second}`;
+            
+            // 获取文件扩展名
+            const extension = originalName.includes('.') 
+                ? '.' + originalName.split('.').pop() 
+                : '';
+            
+            return timestampStr + extension;
+        }
+        
+        // 格式化文件大小
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+        
+        // 更新文件列表显示
+        function updateFileList() {
+            if (filesList.length === 0) {
+                fileList.classList.remove('show');
+                actionButtons.classList.remove('show');
+                return;
+            }
+            
+            fileList.classList.add('show');
+            actionButtons.classList.add('show');
+            fileCount.textContent = `已添加 ${filesList.length} 个文件`;
+            
+            fileItems.innerHTML = '';
+            filesList.forEach((fileData, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <div class="file-item-header">
+                        <div>
+                            <span class="file-number">${index + 1}</span>
+                            <span class="file-name">${fileData.file.name}</span>
+                        </div>
+                        <div>
+                            <button class="btn btn-download" onclick="downloadSingle(${index})">下载</button>
+                            <button class="btn btn-remove" onclick="removeFile(${index})">删除</button>
+                        </div>
+                    </div>
+                    <div class="file-item-info">
+                        <div>新文件名: <span class="new-name">${fileData.newName}</span></div>
+                        <div class="file-size">大小: ${formatFileSize(fileData.file.size)} | 添加时间: ${new Date(fileData.timestamp).toLocaleString('zh-CN')}</div>
+                    </div>
+                `;
+                fileItems.appendChild(fileItem);
+            });
+        }
+        
+        // 添加文件
+        function addFiles(files) {
+            let currentTime = Date.now();
+            
+            Array.from(files).forEach((file, index) => {
+                // 每个文件时间戳递增1秒，确保不重复
+                const timestamp = currentTime + (index * 1000);
+                const newName = generateTimestampName(file.name, timestamp);
+                
+                filesList.push({
+                    id: fileCounter++,
+                    file: file,
+                    newName: newName,
+                    timestamp: timestamp
+                });
+            });
+            
+            updateFileList();
+        }
+        
+        // 删除文件
+        window.removeFile = function(index) {
+            filesList.splice(index, 1);
+            updateFileList();
+        }
+        
+        // 下载单个文件
+        window.downloadSingle = function(index) {
+            const fileData = filesList[index];
+            const url = URL.createObjectURL(fileData.file);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileData.newName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        // 下载全部文件（打包成ZIP）
+        downloadAllBtn.addEventListener('click', async () => {
+            if (filesList.length === 0) return;
+            
+            downloadAllBtn.textContent = '📦 打包中...';
+            downloadAllBtn.disabled = true;
+            
+            try {
+                const zip = new JSZip();
+                
+                for (const fileData of filesList) {
+                    zip.file(fileData.newName, fileData.file);
+                }
+                
+                const content = await zip.generateAsync({ type: 'blob' });
+                const url = URL.createObjectURL(content);
+                const a = document.createElement('a');
+                a.href = url;
+                
+                const now = new Date();
+                const zipName = `renamed_files_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}.zip`;
+                
+                a.download = zipName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                alert('打包失败: ' + error.message);
+            }
+            
+            downloadAllBtn.textContent = '📥 下载全部文件';
+            downloadAllBtn.disabled = false;
+        });
+        
+        // 清空列表
+        clearAllBtn.addEventListener('click', () => {
+            if (confirm('确定要清空所有文件吗？')) {
+                filesList = [];
+                updateFileList();
+            }
+        });
+        
+        // 点击上传区域
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        // 文件选择
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                addFiles(e.target.files);
+                fileInput.value = ''; // 清空input，允许重复添加相同文件
+            }
+        });
+        
+        // 拖拽功能
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            if (e.dataTransfer.files.length > 0) {
+                addFiles(e.dataTransfer.files);
+            }
+        });
+    </script>
+</body>
+</html>
