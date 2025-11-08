@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>WonDicab - 智能單詞學習</title>
     <style>
+        /* 保持原有的所有CSS不變 */
         * {
             margin: 0;
             padding: 0;
@@ -29,7 +30,6 @@
             position: relative;
         }
 
-        /* 顶部导航栏 */
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -62,7 +62,6 @@
             cursor: pointer;
         }
 
-        /* 页面容器 */
         .page {
             display: none;
             flex: 1;
@@ -89,7 +88,6 @@
             }
         }
 
-        /* 底部导航 */
         .bottom-nav {
             background: white;
             display: flex;
@@ -128,13 +126,11 @@
             font-size: 12px;
         }
 
-        /* 内容区域 */
         .content {
             padding: 20px;
             flex: 1;
         }
 
-        /* 卡片样式 */
         .card {
             background: white;
             border-radius: 15px;
@@ -143,7 +139,6 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
-        /* 表单样式 */
         .form-group {
             margin-bottom: 15px;
         }
@@ -181,7 +176,6 @@
             font-family: inherit;
         }
 
-        /* 按钮样式 */
         .btn {
             width: 100%;
             padding: 15px;
@@ -215,7 +209,6 @@
             cursor: not-allowed;
         }
 
-        /* URL输入组 */
         .url-input-group {
             display: flex;
             gap: 10px;
@@ -238,7 +231,6 @@
             white-space: nowrap;
         }
 
-        /* 加载动画 */
         .loading {
             display: inline-block;
             width: 16px;
@@ -253,7 +245,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* 信息提示 */
         .info-box {
             background: #e3f2fd;
             border-left: 4px solid #2196f3;
@@ -274,7 +265,6 @@
             color: #e65100;
         }
 
-        /* 切换按钮 */
         .toggle-section {
             text-align: center;
             margin: 15px 0;
@@ -290,7 +280,6 @@
             padding: 5px;
         }
 
-        /* 单词列表 */
         .word-item {
             background: white;
             border-radius: 12px;
@@ -367,7 +356,6 @@
             color: #999;
         }
 
-        /* 复习卡片 */
         .review-card {
             background: white;
             border-radius: 20px;
@@ -434,7 +422,6 @@
             color: #2e7d32;
         }
 
-        /* 统计信息 */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -461,7 +448,6 @@
             color: #999;
         }
 
-        /* 空状态 */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -473,7 +459,6 @@
             margin-bottom: 20px;
         }
 
-        /* 设置项 */
         .setting-item {
             display: flex;
             justify-content: space-between;
@@ -569,13 +554,12 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- 顶部导航 -->
         <div class="header">
             <h1 id="headerTitle">WonDicab</h1>
             <button class="header-btn" id="syncBtn" data-i18n="sync">同步</button>
         </div>
 
-        <!-- 主页 - 今日复习 -->
+        <!-- 主頁 -->
         <div class="page active" id="homePage">
             <div class="content">
                 <div class="card">
@@ -591,20 +575,16 @@
                         </div>
                     </div>
                 </div>
-
-                <div id="reviewContainer">
-                    <!-- 复习内容 -->
-                </div>
+                <div id="reviewContainer"></div>
             </div>
         </div>
 
-        <!-- 添加单词页 -->
+        <!-- 添加頁面 -->
         <div class="page" id="addPage">
             <div class="content">
                 <div class="card">
                     <h2 style="margin-bottom: 20px;" data-i18n="addNewWord">➕ 添加新單詞</h2>
                     
-                    <!-- 方法1: URL导入 -->
                     <div id="urlImportSection">
                         <div class="info-box" data-i18n="urlImportTip">
                             💡 粘貼劍橋詞典URL，自動獲取單詞信息
@@ -622,7 +602,6 @@
                         </div>
                     </div>
 
-                    <!-- 方法2: 粘贴HTML -->
                     <div class="toggle-section">
                         <button class="toggle-btn" onclick="toggleImportMethod()" data-i18n="pasteHtmlToggle">
                             或者粘貼網頁HTML內容 →
@@ -640,7 +619,6 @@
                         <div class="form-group">
                             <label class="form-label" data-i18n="pasteWebContent">粘貼網頁內容</label>
                             <textarea class="form-textarea" id="htmlInput" 
-                                      data-i18n-placeholder="pasteHtmlPlaceholder"
                                       placeholder="粘貼劍橋詞典頁面內容..."
                                       style="min-height: 120px;"></textarea>
                         </div>
@@ -656,28 +634,23 @@
                     <form id="addWordForm">
                         <div class="form-group">
                             <label class="form-label" data-i18n="englishWord">英文單詞</label>
-                            <input type="text" class="form-input" id="wordInput" required 
-                                   data-i18n-placeholder="wordPlaceholder" placeholder="例: apple">
+                            <input type="text" class="form-input" id="wordInput" required placeholder="例: apple">
                         </div>
                         <div class="form-group">
                             <label class="form-label" data-i18n="partOfSpeech">詞性 (可選)</label>
-                            <input type="text" class="form-input" id="posInput" 
-                                   data-i18n-placeholder="posPlaceholder" placeholder="例: noun, verb">
+                            <input type="text" class="form-input" id="posInput" placeholder="例: noun, verb">
                         </div>
                         <div class="form-group">
                             <label class="form-label" data-i18n="chineseMeaning">中文意思</label>
-                            <input type="text" class="form-input" id="meaningInput" required 
-                                   data-i18n-placeholder="meaningPlaceholder" placeholder="例: 蘋果">
+                            <input type="text" class="form-input" id="meaningInput" required placeholder="例: 蘋果">
                         </div>
                         <div class="form-group">
                             <label class="form-label" data-i18n="englishMeaning">英文意思 (可選)</label>
-                            <input type="text" class="form-input" id="enMeaningInput" 
-                                   data-i18n-placeholder="enMeaningPlaceholder" placeholder="例: a round fruit">
+                            <input type="text" class="form-input" id="enMeaningInput" placeholder="例: a round fruit">
                         </div>
                         <div class="form-group">
                             <label class="form-label" data-i18n="examples">例句 (可選，多個例句用換行分隔)</label>
                             <textarea class="form-textarea" id="exampleInput" 
-                                      data-i18n-placeholder="examplePlaceholder"
                                       placeholder="例: I eat an apple every day.&#10;Apples are healthy."></textarea>
                         </div>
                         <button type="submit" class="btn btn-primary" data-i18n="addWord">添加單詞</button>
@@ -688,16 +661,14 @@
             </div>
         </div>
 
-        <!-- 单词库页 -->
+        <!-- 單詞庫頁面 -->
         <div class="page" id="libraryPage">
             <div class="content">
-                <div id="wordList">
-                    <!-- 单词列表 -->
-                </div>
+                <div id="wordList"></div>
             </div>
         </div>
 
-        <!-- 设置页 -->
+        <!-- 設置頁面 -->
         <div class="page" id="settingsPage">
             <div class="content">
                 <div class="card">
@@ -715,18 +686,20 @@
                     <h2 style="margin-bottom: 20px;" data-i18n="syncSettings">⚙️ 數據同步設置</h2>
                     <div class="form-group">
                         <label class="form-label" data-i18n="userId">用戶 ID</label>
-                        <input type="text" class="form-input" id="userIdInput" 
-                               data-i18n-placeholder="userIdPlaceholder" placeholder="您的唯一標識">
+                        <input type="text" class="form-input" id="userIdInput" placeholder="您的唯一標識">
                     </div>
                     <div class="form-group">
                         <label class="form-label" data-i18n="githubToken">GitHub Token</label>
-                        <input type="password" class="form-input" id="tokenInput" 
-                               data-i18n-placeholder="tokenPlaceholder" placeholder="GitHub Personal Access Token">
+                        <input type="password" class="form-input" id="tokenInput" placeholder="GitHub Personal Access Token">
                     </div>
                     <div class="form-group">
                         <label class="form-label" data-i18n="repoName">倉庫名稱</label>
-                        <input type="text" class="form-input" id="repoInput" 
-                               data-i18n-placeholder="repoPlaceholder" placeholder="用戶名/倉庫名">
+                        <input type="text" class="form-input" id="repoInput" placeholder="用戶名/倉庫名">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="folderPath">文件夾路徑 (可選)</label>
+                        <input type="text" class="form-input" id="folderInput" placeholder="例: wondicab">
+                        <small style="color: #999; font-size: 12px;">留空則保存到倉庫根目錄</small>
                     </div>
                     <button class="btn btn-primary" id="saveSettingsBtn" data-i18n="saveSettings">保存設置</button>
                     <button class="btn btn-primary" style="margin-top: 10px;" id="downloadDataBtn" data-i18n="downloadData">下載數據</button>
@@ -751,7 +724,7 @@
             </div>
         </div>
 
-        <!-- 底部导航 -->
+        <!-- 底部導航 -->
         <div class="bottom-nav">
             <div class="nav-item active" data-page="homePage">
                 <div class="nav-icon">🏠</div>
@@ -772,7 +745,6 @@
         </div>
     </div>
 
-    <!-- 单词详情弹窗 -->
     <div class="word-detail-modal" id="wordDetailModal">
         <div class="modal-content">
             <span class="modal-close" id="closeModal">✕</span>
@@ -781,22 +753,17 @@
     </div>
 
     <script>
-        // 語言翻譯對象
+        // 語言翻譯（保持之前的translations對象）
         const translations = {
             'zh-TW': {
-                // 頁面標題
                 todayReview: '📚 今日復習',
                 addNewWord: '➕ 添加新單詞',
                 library: '📚 單詞庫',
                 settings: '⚙️ 設置',
-                
-                // 導航
                 navReview: '復習',
                 navAdd: '添加',
                 navLibrary: '單詞庫',
                 navSettings: '設置',
-                
-                // 按鈕
                 sync: '同步',
                 fetch: '獲取',
                 addWord: '添加單詞',
@@ -805,12 +772,8 @@
                 parseContent: '解析內容',
                 showAnswer: '顯示答案',
                 deleteWord: '刪除單詞',
-                
-                // 統計
                 toReview: '待復習',
                 totalWords: '總單詞',
-                
-                // 表單標籤
                 cambridgeUrl: '劍橋詞典URL',
                 englishWord: '英文單詞',
                 partOfSpeech: '詞性 (可選)',
@@ -820,67 +783,41 @@
                 userId: '用戶 ID',
                 githubToken: 'GitHub Token',
                 repoName: '倉庫名稱',
-                
-                // 佔位符
-                wordPlaceholder: '例: apple',
-                posPlaceholder: '例: noun, verb',
-                meaningPlaceholder: '例: 蘋果',
-                enMeaningPlaceholder: '例: a round fruit',
-                examplePlaceholder: '例: I eat an apple every day.\nApples are healthy.',
-                userIdPlaceholder: '您的唯一標識',
-                tokenPlaceholder: 'GitHub Personal Access Token',
-                repoPlaceholder: '用戶名/倉庫名',
-                pasteHtmlPlaceholder: '粘貼劍橋詞典頁面內容...',
-                
-                // 提示信息
+                folderPath: '文件夾路徑 (可選)',
                 urlImportTip: '💡 粘貼劍橋詞典URL，自動獲取單詞信息',
                 pasteHtmlToggle: '或者粘貼網頁HTML內容 →',
                 htmlImportInstructions: '⚠️ 如果URL獲取失敗，可以：<br>1. 在劍橋詞典頁面按 Ctrl+A (全選)<br>2. 按 Ctrl+C (複製)<br>3. 粘貼到下面的框中',
                 orManualInput: '或手動輸入',
                 pasteWebContent: '粘貼網頁內容',
-                
-                // 設置
                 languageSettings: '🌐 語言設置',
                 selectLanguage: '選擇語言',
                 syncSettings: '⚙️ 數據同步設置',
                 learningStats: '📊 學習統計',
-                
-                // 等級
                 unfamiliar: '不熟悉',
                 medium: '中等',
                 familiar: '熟悉',
                 newWord: '新單詞',
-                
-                // 詞性標籤
                 chinese: '中文',
                 english: '英文',
                 statistics: '統計',
                 reviewCount: '復習次數',
                 proficiency: '熟悉程度',
                 nextReview: '下次復習',
-                
-                // 空狀態
                 noReviewToday: '今天沒有需要復習的單詞',
                 reviewComplete: '復習完成！',
                 reviewCompleteDesc: '今天的復習任務已完成',
                 noWords: '還沒有單詞',
                 noWordsDesc: '點擊"添加"開始學習吧',
                 great: '太棒了！',
-                
-                // 復習按鈕
                 notFamiliar: '😰 不熟',
                 somewhatFamiliar: '🤔 中等',
                 veryFamiliar: '😊 熟悉',
-                
-                // 消息
                 wordAdded: '✅ 單詞添加成功！',
                 fetchSuccess: '✅ 成功獲取單詞信息！',
                 settingsSaved: '✅ 設置已保存',
                 syncSuccess: '✅ 同步成功！',
                 downloadSuccess: '✅ 數據下載成功！',
                 parseSuccess: '✅ 成功解析單詞信息！',
-                
-                // 錯誤消息
                 enterUrl: '請輸入劍橋詞典URL',
                 invalidUrl: '請輸入有效的劍橋詞典URL',
                 fetchFailed: '❌ 所有代理都失敗了，請嘗試"粘貼HTML內容"方式',
@@ -891,24 +828,17 @@
                 configureGithub: '請先在設置中配置 GitHub 信息',
                 configureGithubFirst: '請先配置 GitHub 信息',
                 downloadNotFound: '文件不存在或權限不足',
-                
-                // 確認對話框
                 confirmDelete: '確定要刪除這個單詞嗎？'
             },
             'en': {
-                // Page titles
                 todayReview: '📚 Today\'s Review',
                 addNewWord: '➕ Add New Word',
                 library: '📚 Word Library',
                 settings: '⚙️ Settings',
-                
-                // Navigation
                 navReview: 'Review',
                 navAdd: 'Add',
                 navLibrary: 'Library',
                 navSettings: 'Settings',
-                
-                // Buttons
                 sync: 'Sync',
                 fetch: 'Fetch',
                 addWord: 'Add Word',
@@ -917,12 +847,8 @@
                 parseContent: 'Parse Content',
                 showAnswer: 'Show Answer',
                 deleteWord: 'Delete Word',
-                
-                // Stats
                 toReview: 'To Review',
                 totalWords: 'Total Words',
-                
-                // Form labels
                 cambridgeUrl: 'Cambridge Dictionary URL',
                 englishWord: 'English Word',
                 partOfSpeech: 'Part of Speech (Optional)',
@@ -932,67 +858,41 @@
                 userId: 'User ID',
                 githubToken: 'GitHub Token',
                 repoName: 'Repository Name',
-                
-                // Placeholders
-                wordPlaceholder: 'e.g., apple',
-                posPlaceholder: 'e.g., noun, verb',
-                meaningPlaceholder: 'e.g., 蘋果',
-                enMeaningPlaceholder: 'e.g., a round fruit',
-                examplePlaceholder: 'e.g., I eat an apple every day.\nApples are healthy.',
-                userIdPlaceholder: 'Your unique identifier',
-                tokenPlaceholder: 'GitHub Personal Access Token',
-                repoPlaceholder: 'username/repository',
-                pasteHtmlPlaceholder: 'Paste Cambridge Dictionary page content...',
-                
-                // Tips
+                folderPath: 'Folder Path (Optional)',
                 urlImportTip: '💡 Paste Cambridge Dictionary URL to auto-fetch word info',
                 pasteHtmlToggle: 'Or paste webpage HTML content →',
                 htmlImportInstructions: '⚠️ If URL fetch fails, you can:<br>1. Press Ctrl+A on Cambridge Dictionary page<br>2. Press Ctrl+C to copy<br>3. Paste into the box below',
                 orManualInput: 'Or enter manually',
                 pasteWebContent: 'Paste Web Content',
-                
-                // Settings
                 languageSettings: '🌐 Language Settings',
                 selectLanguage: 'Select Language',
                 syncSettings: '⚙️ Data Sync Settings',
                 learningStats: '📊 Learning Statistics',
-                
-                // Levels
                 unfamiliar: 'Unfamiliar',
                 medium: 'Medium',
                 familiar: 'Familiar',
                 newWord: 'New Word',
-                
-                // Detail labels
                 chinese: 'Chinese',
                 english: 'English',
                 statistics: 'Statistics',
                 reviewCount: 'Review Count',
                 proficiency: 'Proficiency',
                 nextReview: 'Next Review',
-                
-                // Empty states
                 noReviewToday: 'No words to review today',
                 reviewComplete: 'Review Complete!',
                 reviewCompleteDesc: 'Today\'s review task is complete',
                 noWords: 'No words yet',
                 noWordsDesc: 'Click "Add" to start learning',
                 great: 'Great!',
-                
-                // Review buttons
                 notFamiliar: '😰 Hard',
                 somewhatFamiliar: '🤔 Medium',
                 veryFamiliar: '😊 Easy',
-                
-                // Messages
                 wordAdded: '✅ Word added successfully!',
                 fetchSuccess: '✅ Word info fetched successfully!',
                 settingsSaved: '✅ Settings saved',
                 syncSuccess: '✅ Sync successful!',
                 downloadSuccess: '✅ Data downloaded successfully!',
                 parseSuccess: '✅ Word info parsed successfully!',
-                
-                // Error messages
                 enterUrl: 'Please enter Cambridge Dictionary URL',
                 invalidUrl: 'Please enter a valid Cambridge Dictionary URL',
                 fetchFailed: '❌ All proxies failed, please try "Paste HTML Content" method',
@@ -1003,8 +903,6 @@
                 configureGithub: 'Please configure GitHub info in settings first',
                 configureGithubFirst: 'Please configure GitHub info first',
                 downloadNotFound: 'File not found or permission denied',
-                
-                // Confirm dialogs
                 confirmDelete: 'Are you sure you want to delete this word?'
             }
         };
@@ -1016,30 +914,27 @@
                 userId: '',
                 token: '',
                 repo: '',
+                folder: '',  // 新增：子文件夾路徑
                 language: 'zh-TW'
             },
             currentReviewIndex: 0,
             todayReviews: []
         };
 
-        // 復習間隔設置（天）
         const REVIEW_INTERVALS = {
             hard: 1,
             medium: 3,
             easy: 7
         };
 
-        // CORS代理列表
         const CORS_PROXIES = [
             'https://api.allorigins.win/raw?url=',
             'https://corsproxy.io/?',
             'https://api.codetabs.com/v1/proxy?quest='
         ];
 
-        // 當前語言
         let currentLang = 'zh-TW';
 
-        // 切換語言
         function changeLanguage() {
             const lang = document.getElementById('languageSelect').value;
             currentLang = lang;
@@ -1047,7 +942,6 @@
             saveLocalData();
             applyTranslations();
             
-            // 更新當前頁面的動態內容
             const currentPage = document.querySelector('.page.active').id;
             if (currentPage === 'homePage') {
                 updateReviewPage();
@@ -1056,38 +950,25 @@
             }
         }
 
-        // 獲取翻譯文本
         function t(key) {
             return translations[currentLang][key] || key;
         }
 
-        // 應用翻譯
         function applyTranslations() {
-            // 翻譯所有帶有 data-i18n 屬性的元素
             document.querySelectorAll('[data-i18n]').forEach(elem => {
                 const key = elem.getAttribute('data-i18n');
                 if (translations[currentLang][key]) {
                     if (elem.tagName === 'INPUT' || elem.tagName === 'TEXTAREA') {
-                        // 對於input和textarea，不更新值，只更新placeholder如果有的話
+                        // 不更新值
                     } else {
                         elem.innerHTML = translations[currentLang][key];
                     }
                 }
             });
 
-            // 翻譯所有帶有 data-i18n-placeholder 屬性的元素
-            document.querySelectorAll('[data-i18n-placeholder]').forEach(elem => {
-                const key = elem.getAttribute('data-i18n-placeholder');
-                if (translations[currentLang][key]) {
-                    elem.placeholder = translations[currentLang][key];
-                }
-            });
-
-            // 更新頁面標題
             document.title = currentLang === 'zh-TW' ? 'WonDicab - 智能單詞學習' : 'WonDicab - Smart Word Learning';
         }
 
-        // 初始化應用
         function initApp() {
             loadLocalData();
             setupEventListeners();
@@ -1095,7 +976,6 @@
             updateUI();
         }
 
-        // 加載本地數據
         function loadLocalData() {
             const savedWords = localStorage.getItem('wondicab_words');
             const savedSettings = localStorage.getItem('wondicab_settings');
@@ -1109,18 +989,17 @@
                 document.getElementById('userIdInput').value = appState.settings.userId || '';
                 document.getElementById('tokenInput').value = appState.settings.token || '';
                 document.getElementById('repoInput').value = appState.settings.repo || '';
+                document.getElementById('folderInput').value = appState.settings.folder || '';  // 加載文件夾路徑
                 currentLang = appState.settings.language || 'zh-TW';
                 document.getElementById('languageSelect').value = currentLang;
             }
         }
 
-        // 保存到本地
         function saveLocalData() {
             localStorage.setItem('wondicab_words', JSON.stringify(appState.words));
             localStorage.setItem('wondicab_settings', JSON.stringify(appState.settings));
         }
 
-        // 切換導入方法
         function toggleImportMethod() {
             const urlSection = document.getElementById('urlImportSection');
             const htmlSection = document.getElementById('htmlImportSection');
@@ -1134,9 +1013,7 @@
             }
         }
 
-        // 設置事件監聽
         function setupEventListeners() {
-            // 底部導航
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.addEventListener('click', function() {
                     const pageId = this.dataset.page;
@@ -1144,29 +1021,20 @@
                 });
             });
 
-            // 添加單詞表單
             document.getElementById('addWordForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 addWord();
             });
 
-            // 保存設置
             document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
-
-            // 同步按鈕
             document.getElementById('syncBtn').addEventListener('click', syncToGitHub);
-
-            // 下載數據
             document.getElementById('downloadDataBtn').addEventListener('click', downloadFromGitHub);
-
-            // 關閉彈窗
             document.getElementById('closeModal').addEventListener('click', closeModal);
             document.getElementById('wordDetailModal').addEventListener('click', function(e) {
                 if (e.target === this) closeModal();
             });
         }
 
-        // 從劍橋詞典URL獲取單詞信息
         async function fetchFromCambridge() {
             const urlInput = document.getElementById('dictUrlInput');
             const url = urlInput.value.trim();
@@ -1226,7 +1094,6 @@
             fetchBtn.textContent = t('fetch');
         }
 
-        // 從HTML內容解析
         function parseFromHTML() {
             const htmlInput = document.getElementById('htmlInput');
             const html = htmlInput.value.trim();
@@ -1255,7 +1122,6 @@
             }
         }
 
-        // 填充表單數據
         function fillFormWithData(wordData) {
             document.getElementById('wordInput').value = wordData.word;
             document.getElementById('posInput').value = wordData.pos || '';
@@ -1264,7 +1130,6 @@
             document.getElementById('exampleInput').value = wordData.examples || '';
         }
 
-        // 從HTML文檔中提取單詞數據
         function extractWordData(doc) {
             const data = {
                 word: '',
@@ -1329,7 +1194,6 @@
             return data;
         }
 
-        // 切換頁面
         function switchPage(pageId) {
             document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
@@ -1354,7 +1218,6 @@
             }
         }
 
-        // 添加單詞
         function addWord() {
             const word = {
                 id: Date.now(),
@@ -1380,12 +1243,10 @@
             updateUI();
         }
 
-        // 更新UI
         function updateUI() {
             updateStats();
         }
 
-        // 更新統計
         function updateStats() {
             const today = new Date().toISOString().split('T')[0];
             const todayReviews = appState.words.filter(w => w.nextReview <= today);
@@ -1394,7 +1255,6 @@
             document.getElementById('totalWordCount').textContent = appState.words.length;
         }
 
-        // 更新復習頁面
         function updateReviewPage() {
             const today = new Date().toISOString().split('T')[0];
             appState.todayReviews = appState.words.filter(w => w.nextReview <= today);
@@ -1416,7 +1276,6 @@
             showReviewCard();
         }
 
-        // 顯示復習卡片
         function showReviewCard() {
             const container = document.getElementById('reviewContainer');
             const word = appState.todayReviews[appState.currentReviewIndex];
@@ -1457,13 +1316,11 @@
             `;
         }
 
-        // 顯示答案
         function showAnswer() {
             document.getElementById('answerSection').classList.remove('hidden');
             document.querySelector('.show-answer-btn').classList.add('hidden');
         }
 
-        // 復習單詞
         function reviewWord(level) {
             const word = appState.todayReviews[appState.currentReviewIndex];
             const wordIndex = appState.words.findIndex(w => w.id === word.id);
@@ -1481,7 +1338,6 @@
             showReviewCard();
         }
 
-        // 更新單詞庫頁面
         function updateLibraryPage() {
             const container = document.getElementById('wordList');
             
@@ -1515,7 +1371,6 @@
             `).join('');
         }
 
-        // 顯示單詞詳情
         function showWordDetail(wordId) {
             const word = appState.words.find(w => w.id === wordId);
             if (!word) return;
@@ -1556,12 +1411,10 @@
             modal.classList.add('active');
         }
 
-        // 關閉彈窗
         function closeModal() {
             document.getElementById('wordDetailModal').classList.remove('active');
         }
 
-        // 刪除單詞
         function deleteWord(wordId) {
             if (confirm(t('confirmDelete'))) {
                 appState.words = appState.words.filter(w => w.id !== wordId);
@@ -1572,7 +1425,6 @@
             }
         }
 
-        // 獲取等級文本
         function getLevelText(level) {
             const texts = {
                 new: t('newWord'),
@@ -1583,7 +1435,6 @@
             return texts[level] || level;
         }
 
-        // 更新統計頁面
         function updateStatsPage() {
             const stats = {
                 hard: appState.words.filter(w => w.level === 'hard').length,
@@ -1596,20 +1447,20 @@
             document.getElementById('easyCount').textContent = stats.easy;
         }
 
-        // 保存設置
         function saveSettings() {
             appState.settings.userId = document.getElementById('userIdInput').value.trim();
             appState.settings.token = document.getElementById('tokenInput').value.trim();
             appState.settings.repo = document.getElementById('repoInput').value.trim();
+            appState.settings.folder = document.getElementById('folderInput').value.trim();  // 保存文件夾路徑
             appState.settings.language = currentLang;
             
             saveLocalData();
             showStatus('settingsStatus', t('settingsSaved'));
         }
 
-        // 同步到GitHub
+        // 修改後的同步到GitHub函數 - 支持子文件夾
         async function syncToGitHub() {
-            const { userId, token, repo } = appState.settings;
+            const { userId, token, repo, folder } = appState.settings;
             
             if (!userId || !token || !repo) {
                 alert(t('configureGithub'));
@@ -1618,7 +1469,8 @@
             }
 
             try {
-                const fileName = `${userId}.json`;
+                // 構建文件路徑：如果有folder則加上，否則直接在根目錄
+                const fileName = folder ? `${folder}/${userId}.json` : `${userId}.json`;
                 const content = btoa(unescape(encodeURIComponent(JSON.stringify(appState.words, null, 2))));
                 
                 let sha = '';
@@ -1660,9 +1512,9 @@
             }
         }
 
-        // 從GitHub下載數據
+        // 修改後的從GitHub下載函數 - 支持子文件夾
         async function downloadFromGitHub() {
-            const { userId, token, repo } = appState.settings;
+            const { userId, token, repo, folder } = appState.settings;
             
             if (!userId || !token || !repo) {
                 alert(t('configureGithubFirst'));
@@ -1670,7 +1522,8 @@
             }
 
             try {
-                const fileName = `${userId}.json`;
+                // 構建文件路徑
+                const fileName = folder ? `${folder}/${userId}.json` : `${userId}.json`;
                 const response = await fetch(`https://api.github.com/repos/${repo}/contents/${fileName}`, {
                     headers: {
                         'Authorization': `token ${token}`,
@@ -1694,7 +1547,6 @@
             }
         }
 
-        // 顯示狀態消息
         function showStatus(elementId, message) {
             const element = document.getElementById(elementId);
             element.textContent = message;
@@ -1704,7 +1556,6 @@
             }, 3000);
         }
 
-        // 顯示錯誤消息
         function showError(elementId, message) {
             const element = document.getElementById(elementId);
             element.textContent = message;
@@ -1714,7 +1565,6 @@
             }, 5000);
         }
 
-        // 啟動應用
         initApp();
     </script>
 </body>
