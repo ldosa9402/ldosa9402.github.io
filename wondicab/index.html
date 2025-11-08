@@ -5,7 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>WonDicab - 智能單詞學習</title>
     <style>
-        /* 保持原有的所有CSS不變 */
+        :root {
+            --bg-primary: #667eea;
+            --bg-secondary: #764ba2;
+            --bg-page: #f5f5f5;
+            --bg-card: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --text-tertiary: #999999;
+            --border-color: #e0e0e0;
+            --shadow: rgba(0,0,0,0.05);
+            --shadow-strong: rgba(0,0,0,0.1);
+            --input-bg: #ffffff;
+            --modal-bg: rgba(0,0,0,0.5);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #667eea;
+            --bg-secondary: #764ba2;
+            --bg-page: #1a1a1a;
+            --bg-card: #2d2d2d;
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --text-tertiary: #808080;
+            --border-color: #404040;
+            --shadow: rgba(0,0,0,0.3);
+            --shadow-strong: rgba(0,0,0,0.5);
+            --input-bg: #3d3d3d;
+            --modal-bg: rgba(0,0,0,0.8);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -14,30 +43,32 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
             min-height: 100vh;
             overflow: hidden;
+            transition: background 0.3s ease;
         }
 
         .app-container {
             max-width: 428px;
             margin: 0 auto;
             height: 100vh;
-            background: #f5f5f5;
+            background: var(--bg-page);
             display: flex;
             flex-direction: column;
-            box-shadow: 0 0 50px rgba(0,0,0,0.3);
+            box-shadow: 0 0 50px var(--shadow-strong);
             position: relative;
+            transition: background 0.3s ease;
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
             color: white;
             padding: 15px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px var(--shadow-strong);
             position: fixed;
             top: 0;
             left: 0;
@@ -52,6 +83,12 @@
             font-weight: 600;
         }
 
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
         .header-btn {
             background: rgba(255,255,255,0.2);
             border: none;
@@ -60,6 +97,37 @@
             border-radius: 20px;
             font-size: 14px;
             cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .theme-toggle {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sync-indicator {
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .sync-indicator.synced {
+            color: #4caf50;
+        }
+
+        .sync-indicator.unsynced {
+            color: #ff9800;
         }
 
         .page {
@@ -89,11 +157,11 @@
         }
 
         .bottom-nav {
-            background: white;
+            background: var(--bg-card);
             display: flex;
             justify-content: space-around;
             padding: 10px 0 max(10px, env(safe-area-inset-bottom));
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 -2px 10px var(--shadow-strong);
             position: fixed;
             bottom: 0;
             left: 0;
@@ -101,6 +169,7 @@
             max-width: 428px;
             margin: 0 auto;
             z-index: 100;
+            transition: background 0.3s ease;
         }
 
         .nav-item {
@@ -108,13 +177,13 @@
             text-align: center;
             padding: 8px;
             cursor: pointer;
-            color: #999;
+            color: var(--text-tertiary);
             transition: all 0.3s;
             -webkit-tap-highlight-color: transparent;
         }
 
         .nav-item.active {
-            color: #667eea;
+            color: var(--bg-primary);
         }
 
         .nav-icon {
@@ -132,11 +201,16 @@
         }
 
         .card {
-            background: white;
+            background: var(--bg-card);
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px var(--shadow);
+            transition: background 0.3s ease;
+        }
+
+        .card h2 {
+            color: var(--text-primary);
         }
 
         .form-group {
@@ -146,7 +220,7 @@
         .form-label {
             display: block;
             margin-bottom: 8px;
-            color: #333;
+            color: var(--text-primary);
             font-weight: 500;
             font-size: 14px;
         }
@@ -156,24 +230,62 @@
         .form-select {
             width: 100%;
             padding: 12px;
-            border: 2px solid #e0e0e0;
+            border: 2px solid var(--border-color);
             border-radius: 10px;
             font-size: 16px;
             transition: border-color 0.3s;
-            background: white;
+            background: var(--input-bg);
+            color: var(--text-primary);
         }
 
         .form-input:focus,
         .form-textarea:focus,
         .form-select:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--bg-primary);
         }
 
         .form-textarea {
             min-height: 80px;
             resize: vertical;
             font-family: inherit;
+        }
+
+        .search-box {
+            position: sticky;
+            top: 0;
+            background: var(--bg-page);
+            padding: 15px 20px;
+            margin: -20px -20px 15px -20px;
+            z-index: 10;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 25px;
+            font-size: 16px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--bg-primary);
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            padding: 5px;
         }
 
         .btn {
@@ -189,13 +301,13 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
             color: white;
         }
 
         .btn-secondary {
-            background: #f0f0f0;
-            color: #333;
+            background: var(--border-color);
+            color: var(--text-primary);
             margin-bottom: 10px;
         }
 
@@ -221,7 +333,7 @@
 
         .btn-fetch {
             padding: 12px 20px;
-            background: #667eea;
+            background: var(--bg-primary);
             color: white;
             border: none;
             border-radius: 10px;
@@ -273,7 +385,7 @@
         .toggle-btn {
             background: none;
             border: none;
-            color: #667eea;
+            color: var(--bg-primary);
             font-size: 14px;
             cursor: pointer;
             text-decoration: underline;
@@ -281,14 +393,15 @@
         }
 
         .word-item {
-            background: white;
+            background: var(--bg-card);
             border-radius: 12px;
             padding: 15px;
             margin-bottom: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px var(--shadow);
             cursor: pointer;
             transition: all 0.3s;
             -webkit-tap-highlight-color: transparent;
+            position: relative;
         }
 
         .word-item:active {
@@ -298,14 +411,41 @@
         .word-title {
             font-size: 18px;
             font-weight: 600;
-            color: #333;
+            color: var(--text-primary);
             margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .speak-btn {
+            background: #e8eaf6;
+            border: none;
+            color: var(--bg-primary);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .speak-btn:hover {
+            background: var(--bg-primary);
+            color: white;
+        }
+
+        .speak-btn:active {
+            transform: scale(0.9);
         }
 
         .word-pos {
             display: inline-block;
             font-size: 12px;
-            color: #667eea;
+            color: var(--bg-primary);
             background: #e8eaf6;
             padding: 2px 8px;
             border-radius: 4px;
@@ -315,7 +455,7 @@
 
         .word-meaning {
             font-size: 14px;
-            color: #666;
+            color: var(--text-secondary);
             margin-bottom: 8px;
         }
 
@@ -353,11 +493,11 @@
         }
 
         .word-next-review {
-            color: #999;
+            color: var(--text-tertiary);
         }
 
         .review-card {
-            background: white;
+            background: var(--bg-card);
             border-radius: 20px;
             padding: 30px;
             text-align: center;
@@ -371,23 +511,46 @@
         .review-word {
             font-size: 32px;
             font-weight: 700;
-            color: #333;
+            color: var(--text-primary);
             margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .review-speak-btn {
+            background: #e8eaf6;
+            border: none;
+            color: var(--bg-primary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .review-meaning {
             font-size: 16px;
-            color: #666;
+            color: var(--text-secondary);
             margin-bottom: 15px;
             line-height: 1.6;
         }
 
         .review-example {
             font-size: 14px;
-            color: #999;
+            color: var(--text-tertiary);
             font-style: italic;
-            line-height: 1.6;
+            line-height: 1.8;
             white-space: pre-line;
+            text-align: left;
+            background: var(--input-bg);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 10px;
         }
 
         .review-buttons {
@@ -430,7 +593,7 @@
         }
 
         .stat-card {
-            background: white;
+            background: var(--bg-card);
             border-radius: 15px;
             padding: 20px;
             text-align: center;
@@ -439,19 +602,23 @@
         .stat-number {
             font-size: 32px;
             font-weight: 700;
-            color: #667eea;
+            color: var(--bg-primary);
             margin-bottom: 5px;
         }
 
         .stat-label {
             font-size: 14px;
-            color: #999;
+            color: var(--text-tertiary);
         }
 
         .empty-state {
             text-align: center;
             padding: 60px 20px;
-            color: #999;
+            color: var(--text-tertiary);
+        }
+
+        .empty-state h3 {
+            color: var(--text-primary);
         }
 
         .empty-icon {
@@ -464,7 +631,8 @@
             justify-content: space-between;
             align-items: center;
             padding: 15px 0;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
         }
 
         .setting-item:last-child {
@@ -474,7 +642,7 @@
         .show-answer-btn {
             width: 100%;
             padding: 15px;
-            background: #667eea;
+            background: var(--bg-primary);
             color: white;
             border: none;
             border-radius: 10px;
@@ -483,6 +651,30 @@
             cursor: pointer;
             margin-top: 20px;
             -webkit-tap-highlight-color: transparent;
+        }
+
+        .mode-switch {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            background: var(--bg-card);
+            border-radius: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--text-primary);
+        }
+
+        .mode-btn.active {
+            background: var(--bg-primary);
+            color: white;
+            border-color: var(--bg-primary);
         }
 
         .hidden {
@@ -509,7 +701,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.5);
+            background: var(--modal-bg);
             display: none;
             align-items: center;
             justify-content: center;
@@ -522,7 +714,7 @@
         }
 
         .modal-content {
-            background: white;
+            background: var(--bg-card);
             border-radius: 20px;
             padding: 30px;
             max-width: 90%;
@@ -531,18 +723,57 @@
             -webkit-overflow-scrolling: touch;
         }
 
+        .modal-content h2 {
+            color: var(--text-primary);
+        }
+
+        .modal-content .form-group > div {
+            color: var(--text-primary);
+        }
+
         .modal-close {
             float: right;
             font-size: 24px;
             cursor: pointer;
-            color: #999;
+            color: var(--text-tertiary);
             -webkit-tap-highlight-color: transparent;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-actions .btn {
+            flex: 1;
+        }
+
+        .edit-btn {
+            background: var(--bg-primary);
+            color: white;
         }
 
         .delete-btn {
             background: #ffebee;
             color: #c62828;
-            margin-top: 20px;
+        }
+
+        .cancel-btn {
+            background: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .save-btn {
+            background: #4caf50;
+            color: white;
+        }
+
+        .last-sync {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            text-align: center;
+            margin-top: 5px;
         }
 
         @supports (padding: max(0px)) {
@@ -556,14 +787,26 @@
     <div class="app-container">
         <div class="header">
             <h1 id="headerTitle">WonDicab</h1>
-            <button class="header-btn" id="syncBtn" data-i18n="sync">同步</button>
+            <div class="header-actions">
+                <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</button>
+                <div class="sync-indicator" id="syncIndicator">
+                    <span id="syncIcon">⚠️</span>
+                </div>
+                <button class="header-btn" id="syncBtn" data-i18n="sync">同步</button>
+            </div>
         </div>
 
-        <!-- 主頁 -->
+        <!-- 主页 -->
         <div class="page active" id="homePage">
             <div class="content">
                 <div class="card">
                     <h2 style="margin-bottom: 15px;" data-i18n="todayReview">📚 今日復習</h2>
+                    
+                    <div class="mode-switch">
+                        <button class="mode-btn active" data-mode="order" onclick="setReviewMode('order')" data-i18n="orderMode">順序</button>
+                        <button class="mode-btn" data-mode="random" onclick="setReviewMode('random')" data-i18n="randomMode">隨機</button>
+                    </div>
+
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-number" id="todayReviewCount">0</div>
@@ -579,7 +822,7 @@
             </div>
         </div>
 
-        <!-- 添加頁面 -->
+        <!-- 添加页面 -->
         <div class="page" id="addPage">
             <div class="content">
                 <div class="card">
@@ -627,7 +870,7 @@
                         </button>
                     </div>
 
-                    <div style="text-align: center; color: #999; margin: 15px 0; font-size: 14px;" data-i18n="orManualInput">
+                    <div style="text-align: center; color: var(--text-tertiary); margin: 15px 0; font-size: 14px;" data-i18n="orManualInput">
                         或手動輸入
                     </div>
 
@@ -661,14 +904,20 @@
             </div>
         </div>
 
-        <!-- 單詞庫頁面 -->
+        <!-- 单词库页面 -->
         <div class="page" id="libraryPage">
             <div class="content">
+                <div class="search-box" style="position: relative;">
+                    <input type="text" class="search-input" id="searchInput" 
+                           placeholder="搜索單詞..." 
+                           oninput="searchWords()">
+                    <button class="search-clear hidden" id="searchClear" onclick="clearSearch()">✕</button>
+                </div>
                 <div id="wordList"></div>
             </div>
         </div>
 
-        <!-- 設置頁面 -->
+        <!-- 设置页面 -->
         <div class="page" id="settingsPage">
             <div class="content">
                 <div class="card">
@@ -699,11 +948,13 @@
                     <div class="form-group">
                         <label class="form-label" data-i18n="folderPath">文件夾路徑 (可選)</label>
                         <input type="text" class="form-input" id="folderInput" placeholder="例: wondicab">
-                        <small style="color: #999; font-size: 12px;">留空則保存到倉庫根目錄</small>
+                        <small style="color: var(--text-tertiary); font-size: 12px;">留空則保存到倉庫根目錄</small>
                     </div>
                     <button class="btn btn-primary" id="saveSettingsBtn" data-i18n="saveSettings">保存設置</button>
                     <button class="btn btn-primary" style="margin-top: 10px;" id="downloadDataBtn" data-i18n="downloadData">下載數據</button>
+                    <button class="btn btn-secondary" style="margin-top: 10px;" id="exportCsvBtn" data-i18n="exportCsv">導出CSV</button>
                     <div class="sync-status hidden" id="settingsStatus"></div>
+                    <div class="last-sync" id="lastSyncTime"></div>
                 </div>
 
                 <div class="card">
@@ -724,7 +975,7 @@
             </div>
         </div>
 
-        <!-- 底部導航 -->
+        <!-- 底部导航 -->
         <div class="bottom-nav">
             <div class="nav-item active" data-page="homePage">
                 <div class="nav-icon">🏠</div>
@@ -753,7 +1004,6 @@
     </div>
 
     <script>
-        // 語言翻譯（保持之前的translations對象）
         const translations = {
             'zh-TW': {
                 todayReview: '📚 今日復習',
@@ -769,11 +1019,17 @@
                 addWord: '添加單詞',
                 saveSettings: '保存設置',
                 downloadData: '下載數據',
+                exportCsv: '導出CSV',
                 parseContent: '解析內容',
                 showAnswer: '顯示答案',
                 deleteWord: '刪除單詞',
+                editWord: '編輯單詞',
+                save: '保存',
+                cancel: '取消',
                 toReview: '待復習',
                 totalWords: '總單詞',
+                orderMode: '順序',
+                randomMode: '隨機',
                 cambridgeUrl: '劍橋詞典URL',
                 englishWord: '英文單詞',
                 partOfSpeech: '詞性 (可選)',
@@ -813,11 +1069,13 @@
                 somewhatFamiliar: '🤔 中等',
                 veryFamiliar: '😊 熟悉',
                 wordAdded: '✅ 單詞添加成功！',
+                wordUpdated: '✅ 單詞更新成功！',
                 fetchSuccess: '✅ 成功獲取單詞信息！',
                 settingsSaved: '✅ 設置已保存',
                 syncSuccess: '✅ 同步成功！',
                 downloadSuccess: '✅ 數據下載成功！',
                 parseSuccess: '✅ 成功解析單詞信息！',
+                csvExported: '✅ CSV文件已下載！',
                 enterUrl: '請輸入劍橋詞典URL',
                 invalidUrl: '請輸入有效的劍橋詞典URL',
                 fetchFailed: '❌ 所有代理都失敗了，請嘗試"粘貼HTML內容"方式',
@@ -828,7 +1086,11 @@
                 configureGithub: '請先在設置中配置 GitHub 信息',
                 configureGithubFirst: '請先配置 GitHub 信息',
                 downloadNotFound: '文件不存在或權限不足',
-                confirmDelete: '確定要刪除這個單詞嗎？'
+                confirmDelete: '確定要刪除這個單詞嗎？',
+                synced: '已同步',
+                unsynced: '未同步',
+                lastSync: '最後同步',
+                never: '從未'
             },
             'en': {
                 todayReview: '📚 Today\'s Review',
@@ -844,11 +1106,17 @@
                 addWord: 'Add Word',
                 saveSettings: 'Save Settings',
                 downloadData: 'Download Data',
+                exportCsv: 'Export CSV',
                 parseContent: 'Parse Content',
                 showAnswer: 'Show Answer',
                 deleteWord: 'Delete Word',
+                editWord: 'Edit Word',
+                save: 'Save',
+                cancel: 'Cancel',
                 toReview: 'To Review',
                 totalWords: 'Total Words',
+                orderMode: 'Order',
+                randomMode: 'Random',
                 cambridgeUrl: 'Cambridge Dictionary URL',
                 englishWord: 'English Word',
                 partOfSpeech: 'Part of Speech (Optional)',
@@ -888,11 +1156,13 @@
                 somewhatFamiliar: '🤔 Medium',
                 veryFamiliar: '😊 Easy',
                 wordAdded: '✅ Word added successfully!',
+                wordUpdated: '✅ Word updated successfully!',
                 fetchSuccess: '✅ Word info fetched successfully!',
                 settingsSaved: '✅ Settings saved',
                 syncSuccess: '✅ Sync successful!',
                 downloadSuccess: '✅ Data downloaded successfully!',
                 parseSuccess: '✅ Word info parsed successfully!',
+                csvExported: '✅ CSV file downloaded!',
                 enterUrl: 'Please enter Cambridge Dictionary URL',
                 invalidUrl: 'Please enter a valid Cambridge Dictionary URL',
                 fetchFailed: '❌ All proxies failed, please try "Paste HTML Content" method',
@@ -903,22 +1173,29 @@
                 configureGithub: 'Please configure GitHub info in settings first',
                 configureGithubFirst: 'Please configure GitHub info first',
                 downloadNotFound: 'File not found or permission denied',
-                confirmDelete: 'Are you sure you want to delete this word?'
+                confirmDelete: 'Are you sure you want to delete this word?',
+                synced: 'Synced',
+                unsynced: 'Not synced',
+                lastSync: 'Last sync',
+                never: 'Never'
             }
         };
 
-        // 應用狀態
         let appState = {
             words: [],
             settings: {
                 userId: '',
                 token: '',
                 repo: '',
-                folder: '',  // 新增：子文件夾路徑
-                language: 'zh-TW'
+                folder: '',
+                language: 'zh-TW',
+                theme: 'light',
+                lastSync: null
             },
             currentReviewIndex: 0,
-            todayReviews: []
+            todayReviews: [],
+            reviewMode: 'order',
+            searchQuery: ''
         };
 
         const REVIEW_INTERVALS = {
@@ -934,6 +1211,21 @@
         ];
 
         let currentLang = 'zh-TW';
+        let editingWordId = null;
+
+        function toggleTheme() {
+            const currentTheme = appState.settings.theme;
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            appState.settings.theme = newTheme;
+            applyTheme(newTheme);
+            saveLocalData();
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            const themeBtn = document.getElementById('themeToggle');
+            themeBtn.textContent = theme === 'light' ? '🌙' : '☀️';
+        }
 
         function changeLanguage() {
             const lang = document.getElementById('languageSelect').value;
@@ -959,7 +1251,6 @@
                 const key = elem.getAttribute('data-i18n');
                 if (translations[currentLang][key]) {
                     if (elem.tagName === 'INPUT' || elem.tagName === 'TEXTAREA') {
-                        // 不更新值
                     } else {
                         elem.innerHTML = translations[currentLang][key];
                     }
@@ -967,10 +1258,13 @@
             });
 
             document.title = currentLang === 'zh-TW' ? 'WonDicab - 智能單詞學習' : 'WonDicab - Smart Word Learning';
+            updateSyncIndicator();
+            updateLastSyncTime();
         }
 
         function initApp() {
             loadLocalData();
+            applyTheme(appState.settings.theme);
             setupEventListeners();
             applyTranslations();
             updateUI();
@@ -989,7 +1283,7 @@
                 document.getElementById('userIdInput').value = appState.settings.userId || '';
                 document.getElementById('tokenInput').value = appState.settings.token || '';
                 document.getElementById('repoInput').value = appState.settings.repo || '';
-                document.getElementById('folderInput').value = appState.settings.folder || '';  // 加載文件夾路徑
+                document.getElementById('folderInput').value = appState.settings.folder || '';
                 currentLang = appState.settings.language || 'zh-TW';
                 document.getElementById('languageSelect').value = currentLang;
             }
@@ -998,6 +1292,105 @@
         function saveLocalData() {
             localStorage.setItem('wondicab_words', JSON.stringify(appState.words));
             localStorage.setItem('wondicab_settings', JSON.stringify(appState.settings));
+            updateSyncIndicator();
+        }
+
+        function updateSyncIndicator() {
+            const indicator = document.getElementById('syncIndicator');
+            const icon = document.getElementById('syncIcon');
+            
+            if (appState.settings.lastSync) {
+                indicator.className = 'sync-indicator synced';
+                icon.textContent = '✅';
+            } else {
+                indicator.className = 'sync-indicator unsynced';
+                icon.textContent = '⚠️';
+            }
+        }
+
+        function updateLastSyncTime() {
+            const lastSyncElem = document.getElementById('lastSyncTime');
+            if (appState.settings.lastSync) {
+                const date = new Date(appState.settings.lastSync);
+                lastSyncElem.textContent = `${t('lastSync')}: ${date.toLocaleString()}`;
+            } else {
+                lastSyncElem.textContent = `${t('lastSync')}: ${t('never')}`;
+            }
+        }
+
+        function speakWord(word) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(word);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.9;
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        function setReviewMode(mode) {
+            appState.reviewMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
+            updateReviewPage();
+        }
+
+        function searchWords() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            appState.searchQuery = query;
+            
+            const clearBtn = document.getElementById('searchClear');
+            if (query) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+            
+            updateLibraryPage();
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            appState.searchQuery = '';
+            document.getElementById('searchClear').classList.add('hidden');
+            updateLibraryPage();
+        }
+
+        function exportToCSV() {
+            if (appState.words.length === 0) {
+                alert(currentLang === 'zh-TW' ? '沒有單詞可以導出' : 'No words to export');
+                return;
+            }
+
+            const headers = ['Word', 'Part of Speech', 'Chinese Meaning', 'English Meaning', 'Examples', 'Level', 'Review Count', 'Next Review'];
+            const rows = appState.words.map(word => [
+                word.word,
+                word.pos || '',
+                word.meaning,
+                word.enMeaning || '',
+                (word.example || '').replace(/\n/g, ' | '),
+                word.level,
+                word.reviewCount,
+                word.nextReview
+            ]);
+
+            let csvContent = headers.join(',') + '\n';
+            rows.forEach(row => {
+                csvContent += row.map(field => `"${field}"`).join(',') + '\n';
+            });
+
+            const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `wondicab_words_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showStatus('settingsStatus', t('csvExported'));
         }
 
         function toggleImportMethod() {
@@ -1029,6 +1422,7 @@
             document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
             document.getElementById('syncBtn').addEventListener('click', syncToGitHub);
             document.getElementById('downloadDataBtn').addEventListener('click', downloadFromGitHub);
+            document.getElementById('exportCsvBtn').addEventListener('click', exportToCSV);
             document.getElementById('closeModal').addEventListener('click', closeModal);
             document.getElementById('wordDetailModal').addEventListener('click', function(e) {
                 if (e.target === this) closeModal();
@@ -1215,6 +1609,7 @@
                 updateLibraryPage();
             } else if (pageId === 'settingsPage') {
                 updateStatsPage();
+                updateLastSyncTime();
             }
         }
 
@@ -1258,6 +1653,11 @@
         function updateReviewPage() {
             const today = new Date().toISOString().split('T')[0];
             appState.todayReviews = appState.words.filter(w => w.nextReview <= today);
+            
+            if (appState.reviewMode === 'random') {
+                appState.todayReviews = shuffleArray([...appState.todayReviews]);
+            }
+            
             appState.currentReviewIndex = 0;
 
             const container = document.getElementById('reviewContainer');
@@ -1276,6 +1676,23 @@
             showReviewCard();
         }
 
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function formatExamples(exampleText) {
+            if (!exampleText) return '';
+            const examples = exampleText.split('\n').filter(e => e.trim());
+            if (examples.length > 1) {
+                return examples.map((ex, idx) => `(${idx + 1}) ${ex}`).join('\n');
+            }
+            return exampleText;
+        }
+
         function showReviewCard() {
             const container = document.getElementById('reviewContainer');
             const word = appState.todayReviews[appState.currentReviewIndex];
@@ -1292,16 +1709,21 @@
                 return;
             }
 
+            const examplesHtml = formatExamples(word.example);
+
             container.innerHTML = `
                 <div class="review-card">
-                    <div class="review-word">${word.word}</div>
-                    ${word.pos ? `<div style="color: #999; margin-bottom: 15px;">${word.pos}</div>` : ''}
+                    <div class="review-word">
+                        ${word.word}
+                        <button class="review-speak-btn" onclick="speakWord('${word.word}')">🔊</button>
+                    </div>
+                    ${word.pos ? `<div style="color: var(--text-tertiary); margin-bottom: 15px;">${word.pos}</div>` : ''}
                     <div id="answerSection" class="hidden">
                         <div class="review-meaning">
                             <strong>${t('chinese')}：</strong>${word.meaning}
                             ${word.enMeaning ? `<br><strong>${t('english')}：</strong>${word.enMeaning}` : ''}
                         </div>
-                        ${word.example ? `<div class="review-example">${word.example}</div>` : ''}
+                        ${examplesHtml ? `<div class="review-example">${examplesHtml}</div>` : ''}
                         <div class="review-buttons">
                             <button class="review-btn btn-hard" onclick="reviewWord('hard')">${t('notFamiliar')}</button>
                             <button class="review-btn btn-medium" onclick="reviewWord('medium')">${t('somewhatFamiliar')}</button>
@@ -1310,7 +1732,7 @@
                     </div>
                     <button class="show-answer-btn" onclick="showAnswer()">${t('showAnswer')}</button>
                 </div>
-                <div style="text-align: center; color: #999; margin-top: 10px;">
+                <div style="text-align: center; color: var(--text-tertiary); margin-top: 10px;">
                     ${appState.currentReviewIndex + 1} / ${appState.todayReviews.length}
                 </div>
             `;
@@ -1352,14 +1774,37 @@
                 return;
             }
 
-            const sortedWords = [...appState.words].sort((a, b) => 
+            let words = [...appState.words];
+            
+            if (appState.searchQuery) {
+                words = words.filter(word => 
+                    word.word.toLowerCase().includes(appState.searchQuery) ||
+                    word.meaning.toLowerCase().includes(appState.searchQuery) ||
+                    (word.enMeaning && word.enMeaning.toLowerCase().includes(appState.searchQuery)) ||
+                    (word.pos && word.pos.toLowerCase().includes(appState.searchQuery))
+                );
+            }
+
+            const sortedWords = words.sort((a, b) => 
                 new Date(b.createdAt) - new Date(a.createdAt)
             );
+
+            if (sortedWords.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🔍</div>
+                        <h3>${currentLang === 'zh-TW' ? '沒有找到單詞' : 'No words found'}</h3>
+                        <p>${currentLang === 'zh-TW' ? '試試其他搜索詞' : 'Try different search terms'}</p>
+                    </div>
+                `;
+                return;
+            }
 
             container.innerHTML = sortedWords.map(word => `
                 <div class="word-item" onclick="showWordDetail(${word.id})">
                     <div class="word-title">
-                        ${word.word}
+                        <span>${word.word}</span>
+                        <button class="speak-btn" onclick="event.stopPropagation(); speakWord('${word.word}')">🔊</button>
                         ${word.pos ? `<span class="word-pos">${word.pos}</span>` : ''}
                     </div>
                     <div class="word-meaning">${word.meaning}</div>
@@ -1378,9 +1823,12 @@
             const modal = document.getElementById('wordDetailModal');
             const content = document.getElementById('modalContent');
             
+            const examplesHtml = formatExamples(word.example);
+            
             content.innerHTML = `
-                <h2 style="margin-bottom: 20px;">
+                <h2 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
                     ${word.word}
+                    <button class="speak-btn" onclick="speakWord('${word.word}')">🔊</button>
                     ${word.pos ? `<span class="word-pos">${word.pos}</span>` : ''}
                 </h2>
                 <div class="form-group">
@@ -1393,10 +1841,10 @@
                     <div>${word.enMeaning}</div>
                 </div>
                 ` : ''}
-                ${word.example ? `
+                ${examplesHtml ? `
                 <div class="form-group">
                     <label class="form-label">${t('examples')}</label>
-                    <div style="font-style: italic; white-space: pre-line;">${word.example}</div>
+                    <div style="font-style: italic; white-space: pre-line; background: var(--input-bg); padding: 15px; border-radius: 10px; line-height: 1.8;">${examplesHtml}</div>
                 </div>
                 ` : ''}
                 <div class="form-group">
@@ -1405,14 +1853,85 @@
                     <div>${t('proficiency')}: ${getLevelText(word.level)}</div>
                     <div>${t('nextReview')}: ${word.nextReview}</div>
                 </div>
-                <button class="btn delete-btn" onclick="deleteWord(${word.id})">${t('deleteWord')}</button>
+                <div class="modal-actions">
+                    <button class="btn edit-btn" onclick="editWord(${word.id})">${t('editWord')}</button>
+                    <button class="btn delete-btn" onclick="deleteWord(${word.id})">${t('deleteWord')}</button>
+                </div>
             `;
             
             modal.classList.add('active');
         }
 
+        function editWord(wordId) {
+            const word = appState.words.find(w => w.id === wordId);
+            if (!word) return;
+
+            editingWordId = wordId;
+            
+            const content = document.getElementById('modalContent');
+            content.innerHTML = `
+                <h2 style="margin-bottom: 20px;">${t('editWord')}</h2>
+                <form id="editWordForm">
+                    <div class="form-group">
+                        <label class="form-label">${t('englishWord')}</label>
+                        <input type="text" class="form-input" id="editWordInput" value="${word.word}" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">${t('partOfSpeech')}</label>
+                        <input type="text" class="form-input" id="editPosInput" value="${word.pos || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">${t('chineseMeaning')}</label>
+                        <input type="text" class="form-input" id="editMeaningInput" value="${word.meaning}" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">${t('englishMeaning')}</label>
+                        <input type="text" class="form-input" id="editEnMeaningInput" value="${word.enMeaning || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">${t('examples')}</label>
+                        <textarea class="form-textarea" id="editExampleInput">${word.example || ''}</textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn cancel-btn" onclick="showWordDetail(${wordId})">${t('cancel')}</button>
+                        <button type="submit" class="btn save-btn">${t('save')}</button>
+                    </div>
+                </form>
+            `;
+
+            document.getElementById('editWordForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveEditedWord();
+            });
+        }
+
+        function saveEditedWord() {
+            const wordIndex = appState.words.findIndex(w => w.id === editingWordId);
+            if (wordIndex === -1) return;
+
+            appState.words[wordIndex].word = document.getElementById('editWordInput').value.trim();
+            appState.words[wordIndex].pos = document.getElementById('editPosInput').value.trim();
+            appState.words[wordIndex].meaning = document.getElementById('editMeaningInput').value.trim();
+            appState.words[wordIndex].enMeaning = document.getElementById('editEnMeaningInput').value.trim();
+            appState.words[wordIndex].example = document.getElementById('editExampleInput').value.trim();
+
+            saveLocalData();
+            showWordDetail(editingWordId);
+            updateLibraryPage();
+            
+            setTimeout(() => {
+                const modal = document.getElementById('wordDetailModal');
+                const statusDiv = document.createElement('div');
+                statusDiv.className = 'sync-status';
+                statusDiv.textContent = t('wordUpdated');
+                modal.querySelector('.modal-content').appendChild(statusDiv);
+                setTimeout(() => statusDiv.remove(), 3000);
+            }, 100);
+        }
+
         function closeModal() {
             document.getElementById('wordDetailModal').classList.remove('active');
+            editingWordId = null;
         }
 
         function deleteWord(wordId) {
@@ -1451,14 +1970,13 @@
             appState.settings.userId = document.getElementById('userIdInput').value.trim();
             appState.settings.token = document.getElementById('tokenInput').value.trim();
             appState.settings.repo = document.getElementById('repoInput').value.trim();
-            appState.settings.folder = document.getElementById('folderInput').value.trim();  // 保存文件夾路徑
+            appState.settings.folder = document.getElementById('folderInput').value.trim();
             appState.settings.language = currentLang;
             
             saveLocalData();
             showStatus('settingsStatus', t('settingsSaved'));
         }
 
-        // 修改後的同步到GitHub函數 - 支持子文件夾
         async function syncToGitHub() {
             const { userId, token, repo, folder } = appState.settings;
             
@@ -1469,7 +1987,6 @@
             }
 
             try {
-                // 構建文件路徑：如果有folder則加上，否則直接在根目錄
                 const fileName = folder ? `${folder}/${userId}.json` : `${userId}.json`;
                 const content = btoa(unescape(encodeURIComponent(JSON.stringify(appState.words, null, 2))));
                 
@@ -1502,6 +2019,10 @@
                 });
 
                 if (response.ok) {
+                    appState.settings.lastSync = new Date().toISOString();
+                    saveLocalData();
+                    updateSyncIndicator();
+                    updateLastSyncTime();
                     alert(t('syncSuccess'));
                 } else {
                     const error = await response.json();
@@ -1512,7 +2033,6 @@
             }
         }
 
-        // 修改後的從GitHub下載函數 - 支持子文件夾
         async function downloadFromGitHub() {
             const { userId, token, repo, folder } = appState.settings;
             
@@ -1522,7 +2042,6 @@
             }
 
             try {
-                // 構建文件路徑
                 const fileName = folder ? `${folder}/${userId}.json` : `${userId}.json`;
                 const response = await fetch(`https://api.github.com/repos/${repo}/contents/${fileName}`, {
                     headers: {
@@ -1535,8 +2054,11 @@
                     const data = await response.json();
                     const content = decodeURIComponent(escape(atob(data.content)));
                     appState.words = JSON.parse(content);
+                    appState.settings.lastSync = new Date().toISOString();
                     saveLocalData();
                     updateUI();
+                    updateSyncIndicator();
+                    updateLastSyncTime();
                     alert(t('downloadSuccess'));
                     switchPage('homePage');
                 } else {
