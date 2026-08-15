@@ -16,6 +16,7 @@
     --p2:#3b82f6; --p2-soft:#dbeafe; --p2-ink:#1d4ed8;
     --p3:#8b5cf6; --p3-soft:#ede9fe; --p3-ink:#6d28d9;
     --p5:#06b6d4; --p5-soft:#cffafe; --p5-ink:#0e7490;
+    --p7:#ec4899; --p7-soft:#fce7f3; --p7-ink:#be185d;
     --meal:#f59e0b; --meal-soft:#fef3c7; --meal-ink:#b45309;
   }
   body[data-theme="dark"]{
@@ -26,6 +27,7 @@
     --p2-soft:rgba(59,130,246,.16);      --p2-ink:#93c5fd;
     --p3-soft:rgba(139,92,246,.16);      --p3-ink:#c4b5fd;
     --p5-soft:rgba(6,182,212,.16);       --p5-ink:#67e8f9;
+    --p7-soft:rgba(236,72,153,.16);      --p7-ink:#f9a8d4;
     --meal-soft:rgba(245,158,11,.16);    --meal-ink:#fcd34d;
     color-scheme:dark;
   }
@@ -68,7 +70,7 @@
   .chip{ font-size:12px; padding:5px 12px; border-radius:999px; font-weight:600; }
   .chip.c-patrol{ background:var(--patrol-soft); color:var(--patrol-ink); }
   .chip.c-meal{ background:var(--meal-soft); color:var(--meal-ink); }
-  .chip.c-p5{ background:var(--p5-soft); color:var(--p5-ink); }
+  .chip.c-p3{ background:var(--p3-soft); color:var(--p3-ink); }
   .sp{ display:flex; align-items:center; gap:12px; margin-top:16px; }
   .sp-track{ flex:1; height:8px; border-radius:99px; background:var(--line); overflow:hidden; }
   .sp-fill{ height:100%; width:0; border-radius:99px;
@@ -255,8 +257,8 @@
       </div>
       <p class="sub">當日值勤 <b>0800 – 2000</b> ・ 全日 12 小時</p>
       <div class="chips">
-        <span class="chip c-p5">主責崗位 5・迎賓區車流管制</span>
-        <span class="chip c-patrol">巡邏 2 次（D・A）</span>
+        <span class="chip c-p3">主責崗位 3・地下貨用升降機登記處</span>
+        <span class="chip c-patrol">巡邏 1 次（E）</span>
         <span class="chip c-meal">用膳 1200–1300</span>
       </div>
       <div class="sp"><div class="sp-track"><div class="sp-fill" id="spFill"></div></div><span id="spTxt">更進度 0%</span></div>
@@ -302,8 +304,8 @@
   <!-- 統計 -->
   <section class="stats">
     <div class="stat reveal" style="--sc:#3b82f6"><small>值勤總時數</small><span class="num" data-val="12">0</span><span class="unit">小時</span><div class="note">0800 – 2000</div></div>
-    <div class="stat reveal" style="--sc:#8b5cf6"><small>崗位當值</small><span class="num" data-val="9.5">0</span><span class="unit">小時</span><div class="note">崗位 2・3・5</div></div>
-    <div class="stat reveal" style="--sc:#10b981"><small>巡邏任務</small><span class="num" data-val="2">0</span><span class="unit">次</span><div class="note">路線 D・路線 A</div></div>
+    <div class="stat reveal" style="--sc:#8b5cf6"><small>崗位當值</small><span class="num" data-val="10">0</span><span class="unit">小時</span><div class="note">崗位 2・3・5・7</div></div>
+    <div class="stat reveal" style="--sc:#10b981"><small>巡邏任務</small><span class="num" data-val="1">0</span><span class="unit">次</span><div class="note">路線 E</div></div>
     <div class="stat reveal" style="--sc:#f59e0b"><small>用餐休息</small><span class="num" data-val="1">0</span><span class="unit">小時</span><div class="note">1200 – 1300</div></div>
   </section>
 
@@ -323,7 +325,7 @@
     <ol class="tl" id="tlBox"></ol>
   </section>
 
-  <footer>整理自當日值勤表（更新版）・ Lucas（0800–2000）</footer>
+  <footer>整理自當日值勤表（最新更新）・ Lucas（0800–2000）</footer>
 </div>
 
 <div class="toast" id="toast"><span class="tdot"></span><span id="toastTxt"></span></div>
@@ -334,22 +336,24 @@
     p2:    { label:"崗位 2・地下停車場閘口",     soft:"var(--p2-soft)",     hex:"#3b82f6" },
     p3:    { label:"崗位 3・地下貨用升降機登記處", soft:"var(--p3-soft)",    hex:"#8b5cf6" },
     p5:    { label:"崗位 5・迎賓區車流管制",     soft:"var(--p5-soft)",     hex:"#06b6d4" },
+    p7:    { label:"崗位 7・頂位",              soft:"var(--p7-soft)",     hex:"#ec4899" },
     meal:  { label:"崗位 4・用膳",              soft:"var(--meal-soft)",   hex:"#f59e0b" }
   };
-  /* ===== 更新版值勤表 ===== */
+  /* ===== 最新更新版值勤表 ===== */
   var SCHEDULE = [
-    { s:"08:00", e:"08:30", code:"D", name:"巡邏路線 D",           type:"patrol" },
-    { s:"08:30", e:"10:00", code:"5", name:"迎賓區車流管制",        type:"p5" },
-    { s:"10:00", e:"11:00", code:"3", name:"地下貨用升降機登記處",   type:"p3" },
-    { s:"11:00", e:"12:00", code:"2", name:"地下停車場閘口",        type:"p2" },
+    { s:"08:00", e:"09:00", code:"3", name:"地下貨用升降機登記處",   type:"p3" },
+    { s:"09:00", e:"10:00", code:"2", name:"地下停車場閘口",        type:"p2" },
+    { s:"10:00", e:"11:00", code:"E", name:"巡邏路線 E",           type:"patrol" },
+    { s:"11:00", e:"12:00", code:"5", name:"迎賓區車流管制",        type:"p5" },
     { s:"12:00", e:"13:00", code:"4", name:"用膳",                 type:"meal" },
-    { s:"13:00", e:"14:00", code:"3", name:"地下貨用升降機登記處",   type:"p3" },
-    { s:"14:00", e:"15:00", code:"2", name:"地下停車場閘口",        type:"p2" },
-    { s:"15:00", e:"16:00", code:"3", name:"地下貨用升降機登記處",   type:"p3" },
-    { s:"16:00", e:"17:00", code:"5", name:"迎賓區車流管制",        type:"p5" },
-    { s:"17:00", e:"18:00", code:"A", name:"巡邏路線 A",           type:"patrol" },
-    { s:"18:00", e:"19:30", code:"5", name:"迎賓區車流管制",        type:"p5" },
-    { s:"19:30", e:"20:00", code:"2", name:"地下停車場閘口",        type:"p2" }
+    { s:"13:00", e:"14:00", code:"5", name:"迎賓區車流管制",        type:"p5" },
+    { s:"14:00", e:"15:00", code:"3", name:"地下貨用升降機登記處",   type:"p3" },
+    { s:"15:00", e:"15:30", code:"5", name:"迎賓區車流管制",        type:"p5" },
+    { s:"15:30", e:"16:00", code:"7", name:"頂位",                 type:"p7" },
+    { s:"16:00", e:"17:00", code:"2", name:"地下停車場閘口",        type:"p2" },
+    { s:"17:00", e:"18:00", code:"3", name:"地下貨用升降機登記處",   type:"p3" },
+    { s:"18:00", e:"19:00", code:"2", name:"地下停車場閘口",        type:"p2" },
+    { s:"19:00", e:"20:00", code:"3", name:"地下貨用升降機登記處",   type:"p3" }
   ];
 
   /* ---------- 工具 ---------- */
@@ -594,7 +598,7 @@
       nowLabel.textContent = "尚未開更";
       nowTitle.textContent = "08:00 開始值勤";
       nowRange.textContent = "";
-      nowNext.textContent = "首項任務：巡邏路線 D・還有 " + fmtDur(480 - m);
+      nowNext.textContent = "首項任務：地下貨用升降機登記處・還有 " + fmtDur(480 - m);
       statusPill.className = "pill wait";
       statusPill.textContent = "未開更";
       document.title = "Lucas · 當日工作時間表";
